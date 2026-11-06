@@ -1,0 +1,9 @@
+node_modules/
+.next/
+next-env.d.ts
+*.tsbuildinfo
+# 本地学习数据（SQLite 文件），不要提交
+data/
+.env*
+# 旧的私人 git 历史备份，不要提交
+.git-private-backup/

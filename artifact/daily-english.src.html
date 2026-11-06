@@ -1,0 +1,1261 @@
+<title>Self Daily English</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Noto+Serif+SC:wght@400&display=swap">
+<style>
+/* Layout: one centered column (max 720px) of white panels on a pale sage ground. Review opens a portrait card sheet; practice is a full-screen sentence.
+   Look: sage — green-grey ground, white rounded panels instead of dark rules, segmented tabs, soft tonal primary buttons.
+   Color carries meaning only: sentence roles (subject brick, verb dark green, object amber, complement blue, adverbial grey),
+   plus stronger red/green for wrong/right and ochre for due; sage marks the current selection and the big numbers. */
+:root{
+  --paper:#EFF2EC; --surface:#FFFFFF; --ink:#2E3A31; --num:#4F6B55; --muted:#76857A; --faint:#A9B4AA; --icon:#8F9C91;
+  --line:#E6ECE2; --line-strong:#D3DCCD; --edge:#9DAA9F; --fill:#E1E7DC; --accent:#4F6B55; --accent-bg:#E1E9DD;
+  --green:#1F8A3E; --red:#D2342A; --red-bg:#FBE4E1; --yellow:#C9A227;
+  --r-s:#B4544A; --r-v:#3E8A5B; --r-o:#CF9419; --r-c:#3F74C2; --r-a:#858585; --r-j:#858585;
+  --f-zh:"Noto Serif SC","Songti SC","STSong","SimSun",serif;
+  --f-ui:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif;
+  --f-en:"Newsreader",Georgia,"Times New Roman",serif;
+  --f-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#121613; --surface:#1A1F1B; --ink:#E2E8E1; --num:#A9C3AE; --muted:#96A398; --faint:#5F6B61; --icon:#7D8A7F;
+  --line:#263027; --line-strong:#334035; --edge:#5A685C; --fill:#232B24; --accent:#A9C3AE; --accent-bg:#26322A;
+  --green:#45C26A; --red:#FF6A5E; --red-bg:#43201D; --yellow:#E0BC45;
+  --r-s:#D9867C; --r-v:#6DB58A; --r-o:#E0AE4A; --r-c:#6E9EDE; --r-a:#9A9A9A; --r-j:#9A9A9A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#121613; --surface:#1A1F1B; --ink:#E2E8E1; --num:#A9C3AE; --muted:#96A398; --faint:#5F6B61; --icon:#7D8A7F;
+  --line:#263027; --line-strong:#334035; --edge:#5A685C; --fill:#232B24; --accent:#A9C3AE; --accent-bg:#26322A;
+  --green:#45C26A; --red:#FF6A5E; --red-bg:#43201D; --yellow:#E0BC45;
+  --r-s:#D9867C; --r-v:#6DB58A; --r-o:#E0AE4A; --r-c:#6E9EDE; --r-a:#9A9A9A; --r-j:#9A9A9A; color-scheme:dark}
+
+[hidden]{display:none!important}
+html,body{background:var(--paper)}
+body{color:var(--ink);font:15px/1.6 var(--f-ui);-webkit-text-size-adjust:100%}
+.wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px 64px;display:flex;flex-direction:column;gap:18px}
+h1,h2,h3,h4{margin:0;line-height:1.3;text-wrap:balance}
+p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,textarea:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--edge);outline-offset:2px}
+.en{font-family:var(--f-en)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--faint);flex:none}
+.dot.due{background:var(--yellow)} .dot.again{background:var(--red)} .dot.good{background:var(--green)}
+.label{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.keys{display:none;font-size:12px;color:var(--faint);text-align:center;padding:10px 16px calc(env(safe-area-inset-bottom,0px) + 12px)}
+.keys kbd{font:11px var(--f-mono);border:1px solid var(--line);border-radius:4px;padding:1px 5px;color:var(--muted)}
+.only-desk{display:none}
+@media (hover:hover) and (pointer:fine){.keys{display:block}.only-desk{display:inline}}
+
+/* header */
+.top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.brand{display:flex;flex-direction:column;gap:2px}
+.brand b{font:600 20px/1.2 var(--f-en);letter-spacing:.01em}
+.brand small{font:italic 400 14px var(--f-en);color:var(--muted)}
+.today-date{color:var(--muted);font-size:13px;padding-top:4px;font-variant-numeric:tabular-nums}
+/* segmented tabs on a sage track; sticky with a paper band behind so content doesn't show around it */
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:3px;background:var(--fill);border-radius:12px;box-shadow:0 0 0 6px var(--paper)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.tabs button{border:0;background:transparent;min-height:40px;border-radius:9px;font-weight:500;color:var(--muted)}
+.tabs button[aria-selected="true"]{color:var(--accent);background:var(--surface);font-weight:600}
+.status{font-size:13px;color:var(--muted)}
+.status:empty{display:none}
+.status.err{color:var(--red)}
+
+/* buttons: white with a hairline; the primary one is a soft sage fill (never a dark solid) */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:46px;padding:0 18px;border-radius:12px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);font-weight:500}
+.btn:active:not(:disabled),.go:active,.legend button:active{background:var(--fill)}
+@media (hover:hover){.btn:hover:not(:disabled){background:var(--fill)}}
+.btn.primary{font-weight:600;border-color:transparent;background:var(--accent-bg);color:var(--accent)}
+.btn.primary:active:not(:disabled){background:var(--fill)}
+.btn.good{border-color:var(--green);color:var(--green)}
+.btn.again{border-color:var(--red);color:var(--red)}
+.btn.small{min-height:36px;padding:0 12px;font-size:13px}
+.btn:disabled{opacity:.35;cursor:default}
+.btn.block{width:100%}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row>.btn{flex:1 1 0}
+.linkish{border:0;background:none;padding:0;color:var(--muted);font-size:13px;text-decoration:underline;text-underline-offset:3px;min-height:32px}
+.text-btn{border:0;background:none;padding:0 2px;min-height:36px;font-size:14px;font-weight:600;color:var(--ink)}
+.text-btn:active{color:var(--muted)}
+
+/* today: two tappable rows */
+.panel,.go-list,.lessons,.streak,.bar-group,.card-box{background:var(--surface);border-radius:14px}
+.go-list{overflow:hidden}
+.go{width:100%;display:flex;align-items:center;gap:12px;min-height:76px;padding:0 14px 0 16px;border:0;background:transparent;text-align:left}
+.go+.go{box-shadow:inset 0 1px 0 var(--line)}
+.go-l{flex:1;display:inline-flex;align-items:center;gap:8px;font-size:17px;font-weight:600}
+.go-n{display:inline-flex;align-items:baseline;gap:6px}
+.go-n b{font:400 40px/1 var(--f-en);font-variant-numeric:tabular-nums;color:var(--num)}
+.go-n small{font-size:13px;color:var(--muted)}
+.go .chev{width:8px;height:8px;border-right:1.5px solid var(--icon);border-top:1.5px solid var(--icon);transform:rotate(45deg);margin:0 6px 0 4px}
+.go:disabled{cursor:default}
+.go:disabled .go-n b,.go:disabled .chev{display:none}
+.section-h{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px;padding:0 4px}
+.section-h .label{font-size:17px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--ink)}
+.section-h .r{display:inline-flex;align-items:center;gap:14px;font-size:13px;color:var(--muted)}
+.empty{color:var(--muted);padding:18px 16px;background:var(--surface);border-radius:14px;display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.empty .text-btn{color:var(--accent)}
+
+/* sessions: rows inside one white panel */
+.lessons{display:flex;flex-direction:column;padding:0 14px}
+.lessons:empty{display:none}
+.lessons .empty{margin:0 -14px}
+.day-label{margin-top:16px;padding:0 2px 2px;font-variant-numeric:tabular-nums}
+details.lesson+details.lesson{box-shadow:inset 0 1px 0 var(--line)}
+details.lesson>summary{list-style:none;padding:14px 2px;display:flex;justify-content:space-between;gap:12px;align-items:center;min-height:48px;cursor:pointer}
+details.lesson>summary::-webkit-details-marker{display:none}
+details.lesson>summary .t{font-size:16px;font-weight:500;color:var(--ink);min-width:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+details.lesson[open]>summary .t{white-space:normal}
+details.lesson>summary .m{flex:none;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+details.lesson>summary::after,details.io>summary::after{content:"";flex:none;width:7px;height:7px;border-right:1.5px solid var(--icon);border-bottom:1.5px solid var(--icon);transform:rotate(45deg);margin-top:-4px;transition:transform .15s}
+details.lesson[open]>summary::after,details.io[open]>summary::after{transform:rotate(-135deg);margin-top:4px}
+.lesson-body{padding:0 2px 18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.para{display:flex;flex-direction:column;gap:10px;font-size:17px;line-height:1.65}
+.fixes,.gram,.sents{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+.fixes li,.sents li{padding-left:12px;border-left:1px solid var(--line-strong)}
+.fixes li{display:flex;flex-direction:column;gap:2px}
+.fixes .ok,.sents .s-en{font-family:var(--f-en);font-size:16px}
+.sents li{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.sents li>div{min-width:0;display:flex;flex-direction:column}
+.note{font-size:13px;color:var(--muted)}
+.gram li{font-size:14px}
+.gram li::before{content:"— ";color:var(--faint)}
+.search{width:100%;box-sizing:border-box;min-height:44px;border:1px solid transparent;border-radius:12px;background:var(--surface);color:var(--ink);padding:0 14px;font:16px var(--f-ui)}
+
+/* stats */
+/* streak: the motivating panel */
+.streak{padding:18px 16px 14px;display:flex;flex-direction:column;gap:14px}
+.st-top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+.st-main{display:flex;align-items:baseline;gap:8px}
+.st-main b{font:400 56px/0.9 var(--f-en);font-variant-numeric:tabular-nums;color:var(--num)}
+.st-main span{font-size:15px;font-weight:500}
+.st-side{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.st-side b{font:400 26px/1 var(--f-en);font-variant-numeric:tabular-nums;color:var(--ink)}
+.st-side span{font-size:12px;color:var(--muted)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:8px 0;justify-items:center}
+.cal span{font-size:11px;color:var(--faint);font-weight:600}
+.cal i{width:22px;height:22px;border-radius:50%;box-sizing:border-box;border:1.5px solid var(--line-strong)}
+.cal i.on{background:var(--accent);border-color:var(--accent)}
+.cal i.future{border-color:var(--line);border-style:dashed}
+.cal i.today{box-shadow:0 0 0 2px var(--surface),0 0 0 3.5px var(--accent)}
+.st-note{font-size:13px;color:var(--muted)}
+.bar-group{display:flex;flex-direction:column;gap:12px;padding:14px 16px 16px}
+.bar-h button:disabled{opacity:.5;cursor:default}
+/* status tiles: each one starts that set */
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.tile{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:10px 12px 12px;border:0;border-radius:12px;background:var(--paper);color:var(--ink);text-align:left;min-height:72px}
+.tile .tl{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);white-space:nowrap}
+.tile b{font:400 28px/1 var(--f-en);font-variant-numeric:tabular-nums}
+.tile .chev{position:absolute;right:12px;bottom:16px;width:7px;height:7px;border-right:1.5px solid var(--icon);border-top:1.5px solid var(--icon);transform:rotate(45deg)}
+.tile:active:not(:disabled){background:var(--fill)}
+@media (hover:hover){.tile:hover:not(:disabled){background:var(--fill)}}
+.tile:disabled{cursor:default;opacity:.5}
+.tile:disabled .chev{display:none}
+.bar-h{display:flex;justify-content:space-between;align-items:baseline}
+.bar-h h3{font-size:15px;font-weight:500}
+.bar-h button{font-size:13px;color:var(--muted);border:0;background:none;min-height:32px;padding:0}
+.bar{display:flex;height:6px;border-radius:3px;overflow:hidden;background:var(--fill);gap:2px}
+.bar i{display:block;height:100%}
+.bar .d{background:var(--yellow)} .bar .g{background:var(--green)} .bar .a{background:var(--red)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 18px}
+.legend button{border:0;background:none;padding:0 2px;min-height:36px;border-radius:6px;display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--ink)}
+.legend button b{font-weight:600;font-variant-numeric:tabular-nums}
+.foot{font-size:12px;color:var(--muted);padding:0 4px}
+.card-box{padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--surface)}
+.card-box p{color:var(--muted);font-size:14px}
+details.io>summary{list-style:none;font-weight:500;font-size:15px;display:flex;justify-content:space-between;align-items:center;min-height:28px;cursor:pointer}
+details.io>summary::-webkit-details-marker{display:none}
+.io-body{display:flex;flex-direction:column;gap:10px;padding-top:14px}
+.io-body .label{margin-top:8px}
+pre.prompt{margin:0;max-height:240px;overflow:auto;white-space:pre-wrap;background:var(--fill);border-radius:8px;padding:12px;font:12.5px/1.55 var(--f-mono);color:var(--ink)}
+
+/* sheets */
+.sheet{position:fixed;left:0;right:0;top:0;height:100%;z-index:20;background:var(--paper);display:flex;flex-direction:column}
+.sheet.top-layer{z-index:30}
+.sheet-head{flex:none;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px;padding:calc(env(safe-area-inset-top,0px) + 6px) max(12px,env(safe-area-inset-right,0px)) 6px max(12px,env(safe-area-inset-left,0px));background:var(--paper)}
+.sheet-head .title{min-width:0;display:flex;flex-direction:column;align-items:center;text-align:center}
+.sheet-head .title b{font-size:14px;font-weight:500;max-width:46vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sheet-head .title small{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sheet-head .side{display:flex;justify-content:flex-end;align-items:center;gap:10px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+/* back button: chevron + "Back", returns to home */
+.app-btn{justify-self:start;display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:0 6px 0 2px;min-height:44px;font:500 15px var(--f-ui);color:var(--accent);white-space:nowrap}
+.app-btn::before{content:"";width:9px;height:9px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-left:4px}
+.app-btn:active{opacity:.6}
+@media (max-width:520px){
+  .sheet-head{gap:6px}
+  .sheet-head .title b{font-size:13px;max-width:38vw}
+  .sheet-head .title small{font-size:11.5px}
+  .colors-btn{gap:5px;font-size:12px}
+}
+.icon-btn{justify-self:start;min-height:44px;border:0;background:transparent;font-weight:500;color:var(--ink);padding:0 4px}
+.sheet-body{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:16px max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 20px) max(16px,env(safe-area-inset-left,0px))}
+.sheet-inner{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.progress{height:2px;background:var(--line);flex:none}
+.progress i{display:block;height:100%;background:var(--edge);transition:width .2s}
+
+/* review: portrait card */
+.r-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:16px max(16px,env(safe-area-inset-right,0px)) 8px max(16px,env(safe-area-inset-left,0px));overflow:hidden}
+.deck{position:relative;width:min(100%,max(200px,calc((100vh - 260px) * .714)),calc(62vh * .714));width:min(100%,max(200px,calc((100dvh - 260px) * .714)),calc(62dvh * .714))}
+.deck .under{position:absolute;inset:0;border-radius:10px;border:1px solid var(--line);background:var(--surface);transform:translate(3px,3px)}
+.flash{position:relative;aspect-ratio:5/7;box-sizing:border-box;background:var(--surface);border-radius:10px;border:1px solid var(--line-strong);padding:16px 18px 14px;display:flex;flex-direction:column;gap:12px;overflow:hidden;touch-action:pan-y;user-select:none;-webkit-user-select:none;will-change:transform;cursor:pointer}
+.flash.flying{transition:transform .3s ease-in,opacity .3s ease-in}
+.flash.settle{transition:transform .2s ease-out}
+.flash .edge{position:absolute;inset:-1px;border-radius:10px;border:2px solid transparent;pointer-events:none;transition:border-color .1s}
+.card-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.chip{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:4px;border:1px solid var(--line);color:var(--muted)}
+.q{font:400 clamp(28px,8.5vw,36px)/1.45 var(--f-zh);margin-block:auto;text-align:center;text-wrap:balance}
+.answer{border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:8px;text-align:center;align-items:center}
+.answer .a{font:400 clamp(28px,8.5vw,36px)/1.3 var(--f-en);text-wrap:balance}
+.tap-hint{font-size:12px;color:var(--faint);text-align:center;min-height:18px}
+.speak{border:1px solid var(--line);background:transparent;border-radius:6px;min-height:32px;padding:0 12px;font-size:13px;color:var(--muted)}
+.r-actions{width:min(100%,420px);display:flex;gap:10px;min-height:46px}
+.r-actions .btn{flex:1}
+.r-actions.off{visibility:hidden}
+div.done{text-align:center;display:flex;flex-direction:column;gap:14px;padding:40px 0;align-items:center}
+div.done b{font:400 52px var(--f-en);color:var(--num)}
+.tally{display:flex;gap:18px;color:var(--muted);font-size:14px;flex-wrap:wrap;justify-content:center}
+.tally span{display:inline-flex;align-items:center;gap:6px}
+
+/* practice: full-screen sentence */
+.p-stage{flex:1;overflow:auto;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:30px;padding:20px max(20px,env(safe-area-inset-right,0px)) 20px max(20px,env(safe-area-inset-left,0px));cursor:text}
+/* touch screens: content sits under the header so the on-screen keyboard can't cover it */
+@media (pointer:coarse){.p-stage{justify-content:flex-start;padding-top:clamp(28px,7vh,64px);gap:26px}}
+.p-zh{font:400 clamp(19px,2.6vw,26px)/1.55 var(--f-zh);color:var(--ink);text-align:center;max-width:900px}
+.p-zh .dict{display:inline-flex;align-items:center;gap:8px;color:var(--muted);font:500 16px var(--f-ui)}
+.slots{display:flex;flex-wrap:wrap;justify-content:center;gap:.55em .55em;max-width:900px;font:400 clamp(24px,3.8vw,40px)/1.35 var(--f-en)}
+.slot{position:relative;min-width:calc(var(--n) * .52em + .3em);text-align:center;border-bottom:2px solid var(--line-strong);padding:0 .08em;white-space:nowrap;min-height:1.35em;box-sizing:border-box;border-radius:3px 3px 0 0}
+.slot.cur{border-bottom-color:var(--ink)}
+.slot.done{border-bottom-color:transparent}
+.slot.hinted{color:var(--muted)}
+.slot.err{color:var(--red);background:var(--red-bg);border-bottom-color:var(--red);animation:shake .3s}
+.slot .rl{position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:5px;font:600 12px/1 var(--f-ui);letter-spacing:.04em;white-space:nowrap}
+.slot .pl{color:var(--muted);font-weight:500}.caret{display:inline-block;width:2px;height:1em;background:var(--ink);vertical-align:-.12em;margin-left:1px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+/* sentence roles */
+.rS{--rc:var(--r-s)} .rV{--rc:var(--r-v)} .rO{--rc:var(--r-o)} .rC,.rK{--rc:var(--r-c)} .rA{--rc:var(--r-a)} .rJ{--rc:var(--r-j)}
+.colors .slot[class*=" r"]:not(.done):not(.err){border-bottom-color:var(--rc)}
+.colors .slot.cur[class*=" r"]:not(.err){border-bottom-width:3px}
+.colors .rl:not(.pl){color:var(--rc)}
+.colors .slot.pos:not(.done):not(.err):not(.cur){border-bottom-color:var(--edge)}
+.colors .done .seg{color:var(--rc)}
+#practice:not(.colors) .rl,#practice:not(.colors) .grp small{visibility:hidden}
+.p-tools{display:flex;gap:18px}
+.p-result{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;max-width:860px}
+/* finished sentence: each role run is a group, its label sits centered under its own underline */
+.p-result .full,.slots.grouped{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:.55em 0}
+.p-result .full{font:400 clamp(24px,3.8vw,40px)/1.3 var(--f-en)}
+.grp{display:inline-flex;flex-direction:column;align-items:center;gap:7px;max-width:100%}
+.grp.sp{margin-left:.3em}
+.grp>span{white-space:pre-wrap;text-decoration:underline 2px var(--line-strong);text-underline-offset:.22em;text-decoration-skip-ink:none}
+.grp small{font:600 13px/1 var(--f-ui);letter-spacing:.04em;color:var(--muted);white-space:nowrap}
+.colors .grp[class*=" r"]>span{color:var(--rc);text-decoration-color:var(--rc)}
+.colors .grp[class*=" r"] small{color:var(--rc)}
+.colors .grp.rA>span{text-decoration-style:dashed}
+.grp.pos>span{text-decoration-color:var(--edge)}
+.grp.pos small{font-weight:500}
+.r-zh{font:400 clamp(17px,2.2vw,21px)/1.6 var(--f-zh);color:var(--muted);margin:4px 0 0}
+.r-line{font-size:13px;color:var(--muted);margin:0}
+.r-line .perfect{color:var(--green);font-weight:600} .r-line .good{color:var(--ink);font-weight:600} .r-line .again{color:var(--red);font-weight:600}
+.r-next{margin-top:28px;display:flex;align-items:center;justify-content:center;gap:12px}
+.combo{color:var(--ink);font-weight:600}
+#practice .side{display:flex;align-items:center;gap:14px;justify-content:flex-end}
+.colors-btn{border:0;background:none;padding:0 2px;min-height:44px;font:13px var(--f-ui);color:var(--muted);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.colors-btn i{width:32px;height:18px;border-radius:9px;border:1.5px solid var(--edge);position:relative;box-sizing:border-box;flex:none}
+.colors-btn i::after{content:"";position:absolute;top:2px;left:2px;width:11px;height:11px;border-radius:50%;background:var(--edge);transition:transform .15s}
+.colors-btn[aria-pressed="true"]{color:var(--ink)}
+.colors-btn[aria-pressed="true"] i{border-color:var(--ink)}
+.colors-btn[aria-pressed="true"] i::after{transform:translateX(14px);background:var(--ink)}
+.colors-btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:6px}
+@media (prefers-reduced-motion:reduce){.colors-btn i::after{transition:none}}
+#pInput{position:absolute;left:0;top:0;width:1px;height:1px;opacity:0;border:0;padding:0;font-size:16px}
+
+/* splitter */
+.sp-zh{font:400 16px/1.55 var(--f-zh);color:var(--muted)}
+.words{display:flex;flex-wrap:wrap;gap:8px}
+.w{border:1px solid var(--line);background:var(--surface);border-radius:8px;min-height:40px;padding:0 10px;font:17px var(--f-en);color:var(--ink)}
+.w.sel{background:var(--fill);border-color:var(--ink)}
+.sp-pick{border:1px dashed var(--line-strong);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.sp-pick .pv{font:18px/1.4 var(--f-en);min-height:25px}
+.sp-pick .pv.empty-pv{font:14px var(--f-ui);color:var(--faint)}
+.field{width:100%;box-sizing:border-box;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);padding:0 12px;font:16px var(--f-ui)}
+.steps{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.steps li{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.steps li>div{flex:1;min-width:0;display:flex;flex-direction:column}
+.steps .s-n{font-size:12px;color:var(--faint);width:18px;flex:none;font-variant-numeric:tabular-nums}
+.steps .s-en{font:16px var(--f-en)}
+.steps .x{border:0;background:none;color:var(--muted);min-width:44px;min-height:40px;font-size:13px}
+
+/* import */
+textarea.paste{width:100%;box-sizing:border-box;min-height:200px;max-height:45vh;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);padding:12px 14px;font:14px/1.55 var(--f-mono);resize:vertical}
+.preview{border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px;font-size:14px;background:var(--surface)}
+.preview ul{margin:0;padding-left:18px}
+.warn{color:var(--red)}
+.file-label{font-size:14px;color:var(--ink);text-decoration:underline;text-underline-offset:3px;min-height:44px;display:inline-flex;align-items:center;cursor:pointer}
+.file-label input{position:absolute;opacity:0;width:1px;height:1px}
+
+.save-bar{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;justify-content:center;padding:0 16px calc(env(safe-area-inset-bottom,0px) + 12px);pointer-events:none}
+.save-bar>div{pointer-events:auto;background:var(--surface);border:1px solid var(--red);color:var(--red);border-radius:10px;padding:8px 8px 8px 14px;display:flex;gap:10px;align-items:center;font-size:14px}
+
+@media (prefers-reduced-motion:reduce){.flash.flying,.flash.settle,.progress i,.slot.err,.caret{transition:none;animation:none}}
+</style>
+
+<div class="wrap" id="app">
+  <header class="top">
+    <div class="brand"><b>Self Daily English</b><small>One small step a day.</small></div>
+    <div class="today-date" id="todayDate"></div>
+  </header>
+  <nav class="tabs" role="tablist">
+    <button role="tab" id="tab-today" data-tab="today" aria-selected="true">Today</button>
+    <button role="tab" id="tab-history" data-tab="history" aria-selected="false">History</button>
+    <button role="tab" id="tab-stats" data-tab="stats" aria-selected="false">Stats</button>
+  </nav>
+  <p class="status" id="status" role="status">Loading your practice…</p>
+
+  <section id="p-today" role="tabpanel">
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="go-list">
+        <button class="go" id="goReview" data-action="scope" data-scope="c:due"><span class="go-l"><i class="dot due" id="dotC"></i>Review</span><span class="go-n"><b id="dueCards">0</b><small id="lblC">cards due</small></span><i class="chev"></i></button>
+        <button class="go" id="goPractice" data-action="scope" data-scope="s:due"><span class="go-l"><i class="dot due" id="dotS"></i>Practice</span><span class="go-n"><b id="dueSents">0</b><small id="lblS">sentences due</small></span><i class="chev"></i></button>
+      </div>
+      <div class="section-h"><span class="label">Today's sessions</span><span class="r"><span id="todayCount"></span></span></div>
+      <div class="lessons" id="todayLessons"></div>
+    </div>
+  </section>
+
+  <section id="p-history" role="tabpanel" hidden>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <input class="search" id="search" type="search" placeholder="Search Chinese, English or topic" autocomplete="off">
+      <div class="lessons" id="historyList"></div>
+    </div>
+  </section>
+
+  <section id="p-stats" role="tabpanel" hidden>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="streak" id="streakBox"></div>
+      <div class="bar-group" id="statC"></div>
+      <div class="bar-group" id="statS"></div>
+      <p class="foot">A day counts when you import a sheet, review or practice. If you haven't practiced today, the streak counts from yesterday.</p>
+      <details class="card-box io" id="ioBox">
+        <summary>Import &amp; export</summary>
+        <div class="io-body">
+          <span class="label">Import</span>
+          <p>Paste a practice sheet from your AI (the older summary format works too), or a backup you exported. Importing the same session again only adds new items; your progress is kept.</p>
+          <button class="btn" data-action="open-import">Import a sheet or backup</button>
+          <span class="label">Practice sheet format</span>
+          <p>Send this to your AI, or put it in its custom instructions. After each session say 「总结」; it replies with a code block. Copy it and import it here.</p>
+          <pre class="prompt" id="promptText"></pre>
+          <button class="btn" data-action="copy-prompt">Copy format</button>
+          <span class="label">Backup</span>
+          <p>A backup holds every session, card, split and your progress, in the same format as the local daily-english-local app, so either side can import it. Use Export JSON to save a file. If your phone can't save files, use Copy backup text and paste it into Notes or the other app's import box.</p>
+          <div class="row">
+            <button class="btn" data-action="export">Export JSON</button>
+            <button class="btn" data-action="copy-export">Copy backup text</button>
+          </div>
+          <textarea class="paste" id="exportBox" readonly hidden aria-label="Backup text"></textarea>
+        </div>
+      </details>
+    </div>
+  </section>
+</div>
+
+<div class="sheet" id="review" hidden role="dialog" aria-modal="true" aria-label="Review cards"></div>
+
+<div class="sheet" id="practice" hidden role="dialog" aria-modal="true" aria-label="Sentence practice">
+  <div class="sheet-head">
+    <button class="app-btn" data-action="close-practice" aria-label="Back to home">Back</button>
+    <div class="title"><b id="pTitle"></b><small id="pProg"></small></div>
+    <div class="side"><span class="combo" id="pCombo"></span><button class="colors-btn" data-action="p-colors" id="pColorsBtn" aria-pressed="true"><i></i>Colors</button></div>
+  </div>
+  <div class="progress"><i id="pBar" style="width:0"></i></div>
+  <div class="p-stage" id="pStage">
+    <div id="pMain" style="display:contents">
+      <div class="p-zh" id="pZh"></div>
+      <div class="slots" id="pSlots" aria-live="polite"></div>
+      <div class="p-tools" id="pTools">
+        <button class="linkish" data-action="p-hint">Hint</button>
+        <button class="linkish" data-action="p-replay">Listen</button>
+        <button class="linkish" data-action="p-split">Edit steps</button>
+      </div>
+      <div class="p-result" id="pResult" hidden></div>
+    </div>
+    <div id="pAlt" hidden style="display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center"></div>
+  </div>
+  <div class="keys"><kbd>Space</kbd> next word · <kbd>Enter</kbd> confirm / next · <kbd>Tab</kbd> hint · <kbd>Ctrl</kbd>+<kbd>Space</kbd> listen · <kbd>Esc</kbd> exit</div>
+  <input id="pInput" type="email" inputmode="email" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="next" aria-label="Type the English">
+</div>
+
+<div class="sheet top-layer" id="splitter" hidden role="dialog" aria-modal="true" aria-label="Split sentence">
+  <div class="sheet-head">
+    <button class="icon-btn" data-action="close-split">Cancel</button>
+    <div class="title"><b>Split sentence</b><small>Short to long · full sentence added last</small></div>
+    <div class="side"><button class="btn small primary" data-action="save-split">Save</button></div>
+  </div>
+  <div class="sheet-body"><div class="sheet-inner">
+    <p class="sp-zh" id="spZh"></p>
+    <p class="note">Tap a first word, then a last word, to select a piece.</p>
+    <div class="words" id="spWords"></div>
+    <div class="sp-pick">
+      <div class="pv empty-pv" id="spPreview">Nothing selected</div>
+      <input class="field" id="spZhInput" type="text" placeholder="Chinese for this piece (optional; empty = dictation)" autocomplete="off">
+      <button class="btn" id="spAdd" data-action="sp-add" disabled>Add step</button>
+    </div>
+    <ol class="steps" id="spSteps"></ol>
+    <p class="warn" id="spMsg" hidden></p>
+  </div></div>
+</div>
+
+<div class="sheet" id="importer" hidden role="dialog" aria-modal="true" aria-label="Import">
+  <div class="sheet-head">
+    <button class="app-btn" data-action="close-import" aria-label="Back">Back</button>
+    <div class="title"><b>Import</b><small>Practice sheet, older summary or JSON backup</small></div>
+    <div class="side"></div>
+  </div>
+  <div class="sheet-body"><div class="sheet-inner">
+    <textarea class="paste" id="pasteBox" placeholder="Paste the whole practice sheet here&#10;&#10;#练习单 v1&#10;日期: 2026-11-06&#10;主题: …&#10;【词汇】&#10;slice | 片&#10;【句子】&#10;It helps me start my day. | 它帮我开启一天。&#10;= 主:It | 谓:helps | 宾:me | 补:start my day&#10;> start my day | 开启我的一天" aria-label="Practice sheet"></textarea>
+    <label class="file-label">Or choose a file (.txt / .json / .md)<input type="file" id="fileInput" accept=".txt,.json,.md,.csv,text/*,application/json"></label>
+    <div class="preview" id="preview" hidden></div>
+    <div class="row">
+      <button class="btn" id="previewBtn" data-action="preview">Preview</button>
+      <button class="btn primary" id="saveBtn" data-action="save-import" disabled>Save</button>
+    </div>
+  </div></div>
+</div>
+
+<div class="save-bar" id="saveBar" hidden><div><span id="saveMsg"></span><button class="btn small again" data-action="retry-saves">Retry</button></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/ts-fsrs@6.0.0/dist/index.umd.js"></script>
+<script>
+/* ---------- practice-sheet parser (inlined from shared/practice-sheet.js at build time) ---------- */
+/*@@PRACTICE_SHEET@@*/
+
+/* ---------- helpers ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+const bjDate = (ms) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Shanghai' }).format(new Date(ms));
+const todayStr = () => bjDate(Date.now());
+const shiftDay = (iso, d) => new Date(Date.parse(iso + 'T00:00:00Z') + d * 86400000).toISOString().slice(0, 10);
+const clone = (o) => JSON.parse(JSON.stringify(o));
+const docIdOf = (id) => { let s = String(id).replace(/[^A-Za-z0-9_\-.~:@+]/g, '_').slice(0, 150); if (!s || s === '.' || s === '..') s = 'x' + stableHash(String(id)); return s; };
+const lastRating = (c) => c.reviewHistory?.at(-1)?.rating ?? (c.interval >= 3 ? 'good' : undefined);
+const KIND = { vocab: 'Vocab', phrase: 'Phrase', collocation: 'Collocation', sentence: 'Sentence' };
+const ROLE_ZH = { S: '主', V: '谓', O: '宾', C: '表', K: '补', A: '状', J: '连' };
+const isReview = (c) => c.kind !== 'correction' && c.kind !== 'sentence';
+const isSentence = (c) => c.kind === 'sentence';
+const newReqId = () => 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const stripLocal = (c) => { const { _local, ...rest } = c; return rest; };
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+
+const S = { db: null, ready: false, lessons: new Map(), cards: new Map(), got: { l: false, c: false }, tab: 'today', open: new Set(), openH: new Set(), query: '', failed: new Map(), colors: true };
+try { S.colors = localStorage.getItem('de-colors') !== 'off'; } catch {}
+
+/* ---------- scheduling: same as app/review-scheduler.ts in the local app ---------- */
+let schedulerP = null;
+function getScheduler() {
+  if (!window.FSRS?.DefaultScheduler) return null;
+  schedulerP ??= Promise.resolve(FSRS.DefaultScheduler({ version: 'FSRS-6', desiredRetention: 0.9, enableFuzz: false, learningSteps: ['10m'], relearningSteps: ['10m'] }));
+  return schedulerP;
+}
+async function reviewCard(card, id, rating, requestId, now) {
+  if (card.reviewHistory?.some((e) => e.id === requestId)) return card;
+  const sp = getScheduler();
+  if (!sp) throw new Error('The scheduler did not load. Check your connection and reload.');
+  const s = await sp, date = new Date(now);
+  let memory = s.newCard({ cardId: id, now: date });
+  if (card.memory) memory = { ...card.memory, dueAt: new Date(card.memory.dueAt), lastReviewAt: card.memory.lastReviewAt ? new Date(card.memory.lastReviewAt) : null };
+  else if (card.interval > 0) memory = { ...memory, dueAt: new Date(card.due), lastReviewAt: new Date(card.due - card.interval * 86400000), stability: Math.max(0.1, card.interval), difficulty: 5, state: FSRS.State.Review, scheduleStatus: 'review', scheduledDays: card.interval, reps: 1 };
+  const result = s.review({ card: memory, grade: rating === 'again' ? FSRS.Rating.Again : FSRS.Rating.Good, now: date });
+  // practice is once a day: a forgotten card comes back no sooner than tomorrow 00:00 Beijing time
+  // (same-day repeats are the practice-only "Review again" round)
+  const tomorrow = Date.parse(shiftDay(bjDate(now), 1) + 'T00:00:00+08:00');
+  const due = rating === 'again' ? Math.max(result.card.dueAt.getTime(), tomorrow) : result.card.dueAt.getTime();
+  return { ...card, due, interval: (due - now) / 86400000, memory: clone({ ...result.card, dueAt: new Date(due) }), scheduler: 'fsrs-6', reviewHistory: [...(card.reviewHistory ?? []), { id: requestId, at: now, rating, due, log: clone(result.revlog) }] };
+}
+
+/* ratings save in the background; failures wait at the bottom with a Retry (same request id, never counted twice) */
+async function runSave(job) {
+  try {
+    const card = S.cards.get(job.id);
+    if (!card || !S.db) throw new Error('Not connected to your data yet');
+    const next = stripLocal(await reviewCard(card, card.lessonId + '/' + card.index, job.rating, job.req, Date.now()));
+    await S.db.doc('cards/' + job.id).set(clone(next));
+    S.cards.set(job.id, { ...next, _local: true });
+    S.failed.delete(job.req);
+  } catch (e) {
+    job.error = e?.message ?? String(e);
+    S.failed.set(job.req, job);
+  }
+  renderSaveBar();
+}
+function rate(id, rating) { runSave({ id, rating, req: newReqId() }); }
+function renderSaveBar() {
+  $('#saveBar').hidden = !S.failed.size;
+  if (S.failed.size) $('#saveMsg').textContent = `${plural(S.failed.size, 'rating', 'ratings')} didn't save`;
+}
+
+/* ---------- data: lessons/<id> holds a session, cards/<id>~<n> holds each card or sentence with its progress ---------- */
+function lessonCards(docId, pick = () => true) {
+  const out = [];
+  for (const [id, c] of S.cards) if (c.lessonId === docId && pick(c)) out.push({ id, c });
+  return out.sort((a, b) => a.c.index - b.c.index);
+}
+function entries(pick) {
+  const out = [];
+  for (const [id, c] of S.cards) { const l = S.lessons.get(c.lessonId); if (l && pick(c)) out.push({ id, c, l }); }
+  return out.sort((a, b) => a.l.date.localeCompare(b.l.date) || a.c.lessonId.localeCompare(b.c.lessonId) || a.c.index - b.c.index);
+}
+function fullLesson(docId) {
+  const meta = S.lessons.get(docId);
+  if (!meta) return null;
+  const { cardCount, updatedAt, ...rest } = meta;
+  return { ...rest, cards: lessonCards(docId).map(({ c }) => { const { lessonId, index, _local, ...card } = c; return card; }) };
+}
+function exportAll() {
+  return [...S.lessons.keys()].map(fullLesson).filter(Boolean).sort((a, b) => a.date.localeCompare(b.date));
+}
+
+async function connect() {
+  if (!window.claude?.use) return setStatus('Open this page in claude.ai while signed in to read and save your practice.', true);
+  const db = await window.claude.use('db');
+  if (!db) return setStatus("Can't reach your practice data. Make sure you're signed in and opened this page in claude.ai.", true);
+  S.db = db;
+  const timer = setTimeout(() => { if (!S.ready) setStatus("Can't reach your data yet. It will load when the connection is back.", true); }, 10000);
+  const onErr = (e) => { clearTimeout(timer); setStatus(e.code === 'revoked' ? 'Access changed. Reload the page.' : 'Error reading data: ' + e.message, true); };
+  const settle = (key, snap) => {
+    if (!snap.metadata.fromCache) S.got[key] = true;
+    if (S.got.l && S.got.c && !S.ready) { S.ready = true; clearTimeout(timer); setStatus(''); }
+    renderMain();
+  };
+  db.collection('lessons').onSnapshot((snap) => { S.lessons = new Map(snap.docs.map((d) => [d.id, d.data()])); settle('l', snap); }, onErr);
+  db.collection('cards').onSnapshot((snap) => {
+    const next = new Map(snap.docs.map((d) => [d.id, d.data()]));
+    for (const [id, c] of S.cards) if (c._local && !((next.get(id)?.reviewHistory?.length ?? 0) >= (c.reviewHistory?.length ?? 0) && JSON.stringify(next.get(id)?.steps ?? null) === JSON.stringify(c.steps ?? null))) next.set(id, c);
+    S.cards = next;
+    settle('c', snap);
+  }, onErr);
+}
+function setStatus(msg, isErr = false) { const el = $('#status'); el.textContent = msg; el.classList.toggle('err', !!isErr); }
+
+/* ---------- home ---------- */
+// session labels stay short: at most 8 characters, then "…" (the full topic shows when the session is opened)
+const shortTopic = (t) => { const a = Array.from(String(t ?? '').trim()); return a.length > 8 ? a.slice(0, 8).join('').replace(/[、，,；;：:\s]+$/, '') + '…' : a.join(''); };
+function lessonHTML(meta, docId, openSet = S.open) {
+  const cards = lessonCards(docId, isReview), sents = lessonCards(docId, isSentence);
+  const gram = (meta.grammar ?? []).map((g) => `<li>${esc(g)}</li>`).join('');
+  const paras = String(meta.paragraph ?? '').split(/\n\s*\n|\n/).filter((p) => p.trim()).map((p) => `<p>${esc(p)}</p>`).join('');
+  const sentList = sents.map(({ c }) => `<li><div><span class="s-en">${esc(c.en)}</span><span class="note">${esc(c.zh)}</span></div></li>`).join('');
+  // corrected forms only when there are no sentences (never the original mistakes)
+  const fixes = sents.length ? '' : (meta.corrections ?? []).map((c) => `<li><span class="ok">${esc(c.corrected)}</span>${c.meaning ? `<span class="note">${esc(c.meaning)}</span>` : ''}</li>`).join('');
+  return `<details class="lesson" data-id="${esc(docId)}"${openSet.has(docId) ? ' open' : ''}>
+    <summary><span class="t">${esc(shortTopic(meta.topic))}</span><span class="m">${plural(cards.length, 'card', 'cards')} · ${plural(sents.length, 'sentence', 'sentences')}</span></summary>
+    <div class="lesson-body">
+      ${shortTopic(meta.topic) !== meta.topic ? `<p class="note">${esc(meta.topic)}</p>` : ''}
+      ${paras ? `<div class="para en">${paras}</div>` : ''}
+      ${sentList ? `<span class="label">Sentences</span><ul class="sents">${sentList}</ul>` : ''}
+      ${fixes ? `<span class="label">Correct forms</span><ul class="fixes">${fixes}</ul>` : ''}
+      ${gram ? `<span class="label">Grammar</span><ul class="gram">${gram}</ul>` : ''}
+      <div class="row">
+        <button class="btn" data-action="lesson-review" data-id="${esc(docId)}" ${cards.length ? '' : 'disabled'}>Review · ${cards.length}</button>
+        <button class="btn" data-action="lesson-practice" data-id="${esc(docId)}" ${sents.length ? '' : 'disabled'}>Practice · ${sents.length}</button>
+      </div>
+    </div></details>`;
+}
+
+function renderMain() {
+  const today = todayStr(), now = Date.now();
+  $('#todayDate').textContent = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Shanghai', weekday: 'short', month: 'short', day: 'numeric' }).format(new Date(now));
+  const cards = entries(isReview), sents = entries(isSentence);
+  const dueC = cards.filter((e) => e.c.due <= now).length, dueS = sents.filter((e) => e.c.due <= now).length;
+  const row = (n, total, b, lbl, dot, go, one, many) => {
+    $(b).textContent = n;
+    $(dot).hidden = !n;
+    $(go).disabled = !n;
+    $(lbl).textContent = n ? (n === 1 ? one : many) + ' due' : !S.ready ? '' : total ? 'Done for today' : 'Nothing yet';
+  };
+  row(dueC, cards.length, '#dueCards', '#lblC', '#dotC', '#goReview', 'card', 'cards');
+  row(dueS, sents.length, '#dueSents', '#lblS', '#dotS', '#goPractice', 'sentence', 'sentences');
+
+  const metas = [...S.lessons.entries()];
+  const todays = metas.filter(([, m]) => m.date === today);
+  $('#todayCount').textContent = todays.length ? plural(todays.length, 'session', 'sessions') : '';
+  $('#todayLessons').innerHTML = todays.length
+    ? todays.map(([id, m]) => lessonHTML(m, id)).join('')
+    : S.ready ? `<div class="empty"><span>${metas.length ? 'No session today yet.' : 'No sessions yet. After a speaking session, ask your AI for a practice sheet (the format is in Stats).'}</span><button class="text-btn" data-action="open-import">Import a practice sheet</button></div>` : '';
+  renderHistory();
+  renderStats(cards, sents, now);
+}
+
+function renderHistory() {
+  const q = S.query.trim().toLowerCase();
+  let metas = [...S.lessons.entries()].sort((a, b) => b[1].date.localeCompare(a[1].date) || a[1].topic.localeCompare(b[1].topic));
+  if (q) metas = metas.filter(([id, m]) => [m.topic, m.date, m.paragraph, ...lessonCards(id).flatMap(({ c }) => [c.zh, c.en])].join(' ').toLowerCase().includes(q));
+  let html = '', last = '';
+  for (const [id, m] of metas) {
+    if (m.date !== last) { html += `<div class="day-label label">${esc(m.date)}</div>`; last = m.date; }
+    html += lessonHTML(m, id, S.openH);
+  }
+  $('#historyList').innerHTML = html || (S.ready ? `<div class="empty">${q ? 'Nothing matches “' + esc(S.query) + '”.' : 'No sessions yet.'}</div>` : '');
+}
+
+function renderStats(cards, sents, now) {
+  const count = (list) => ({ due: list.filter((e) => SCOPE_PICK.due(e, now)).length, all: list.length, again: list.filter((e) => SCOPE_PICK.again(e, now)).length, good: list.filter((e) => SCOPE_PICK.good(e, now)).length });
+  // one proportion bar, three groups that don't overlap: yellow = due now, green = known (not due yet), red = forgotten (not due yet);
+  // each group is a tile that starts that set
+  const group = (el, n, pre, title, unit) => {
+    const pct = (x) => (n.all ? (x / n.all) * 100 : 0);
+    const seg = (k, cls) => (n[k] ? `<i class="${cls}" style="width:${pct(n[k])}%"></i>` : '');
+    const tile = (k, label, dot) => `<button class="tile" data-action="scope" data-scope="${pre}:${k}"${n[k] ? '' : ' disabled'} aria-label="${label}: ${n[k]}, start"><span class="tl"><i class="dot ${dot}"></i>${label}</span><b>${n[k]}</b><i class="chev" aria-hidden="true"></i></button>`;
+    $(el).innerHTML = `<div class="bar-h"><h3>${title}</h3><button data-action="scope" data-scope="${pre}:all"${n.all ? '' : ' disabled'}>All ${n.all} ${n.all === 1 ? unit.slice(0, -1) : unit} ›</button></div>
+      <div class="bar" role="img" aria-label="Due ${n.due}, Got it ${n.good}, Forgot ${n.again}, of ${n.all}">${seg('due', 'd')}${seg('good', 'g')}${seg('again', 'a')}</div>
+      <div class="tiles">${tile('due', 'Due', 'due')}${tile('good', 'Got it', 'good')}${tile('again', 'Forgot', 'again')}</div>`;
+  };
+  group('#statC', count(cards), 'c', 'Review cards', 'cards');
+  group('#statS', count(sents), 's', 'Practice sentences', 'sentences');
+  renderStreak();
+}
+
+/* streak panel: big streak number, total days, and the last two weeks (Mon–Sun rows) as dots */
+function renderStreak() {
+  const { days, total, streak } = practiceDays();
+  const today = todayStr();
+  const dow = (iso) => (new Date(iso + 'T00:00:00Z').getUTCDay() + 6) % 7; // Monday = 0
+  const start = shiftDay(today, -dow(today) - 7);
+  const cells = Array.from({ length: 14 }, (_, i) => {
+    const d = shiftDay(start, i), cls = d > today ? 'future' : days.has(d) ? 'on' : 'off';
+    return `<i class="${cls}${d === today ? ' today' : ''}" title="${d}"></i>`;
+  }).join('');
+  const heads = ['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((w) => `<span>${w}</span>`).join('');
+  const done = days.has(today);
+  $('#streakBox').innerHTML = `<div class="st-top">
+      <div class="st-main"><b>${streak}</b><span>${streak === 1 ? 'day' : 'days'} in a row</span></div>
+      <div class="st-side"><b>${total}</b><span>${total === 1 ? 'day' : 'days'} in total</span></div>
+    </div>
+    <div class="cal" role="img" aria-label="Practice in the last two weeks">${heads}${cells}</div>
+    <p class="st-note">${done ? 'Today counts. Nice work.' : streak ? 'Practice today to keep the streak going.' : 'Practice today to start a streak.'}</p>`;
+}
+
+/* practice days: session dates (lessons.date) + days with ratings (cards.reviewHistory[].at), Beijing time */
+function practiceDays() {
+  const days = new Set([...S.lessons.values()].map((m) => m.date));
+  for (const c of S.cards.values()) for (const e of c.reviewHistory ?? []) if (Number.isFinite(e.at)) days.add(bjDate(e.at));
+  let d = todayStr(), streak = 0;
+  if (!days.has(d)) d = shiftDay(d, -1);
+  while (days.has(d)) { streak++; d = shiftDay(d, -1); }
+  return { days, total: days.size, streak };
+}
+
+function setTab(t) {
+  if (t === 'history' && S.tab !== 'history') { S.openH.clear(); renderHistory(); }
+  S.tab = t;
+  for (const b of document.querySelectorAll('.tabs button')) b.setAttribute('aria-selected', String(b.dataset.tab === t));
+  for (const k of ['today', 'history', 'stats']) $('#p-' + k).hidden = k !== t;
+  try { localStorage.setItem('de-tab', t); } catch {}
+}
+
+/* ---------- full-screen sheets: scroll lock + iOS keyboard ---------- */
+let openSheets = 0, savedScroll = 0;
+function fitSheet() {
+  const vv = window.visualViewport;
+  for (const el of document.querySelectorAll('.sheet:not([hidden])')) {
+    if (vv) { el.style.height = vv.height + 'px'; el.style.top = vv.offsetTop + 'px'; } else { el.style.height = '100%'; el.style.top = '0'; }
+  }
+}
+function showSheet(el) {
+  if (!el.hidden) return;
+  if (!openSheets++) { savedScroll = window.scrollY; document.documentElement.style.overflow = 'hidden'; }
+  el.hidden = false; fitSheet();
+}
+function hideSheet(el) {
+  if (el.hidden) return;
+  if (el.contains(document.activeElement)) document.activeElement.blur();
+  el.hidden = true;
+  if (!--openSheets) { document.documentElement.style.overflow = ''; window.scrollTo(0, savedScroll); }
+}
+window.visualViewport?.addEventListener('resize', fitSheet);
+window.visualViewport?.addEventListener('scroll', fitSheet);
+const topSheet = () => ['#splitter', '#importer', '#practice', '#review'].map((s) => $(s)).find((el) => !el.hidden);
+
+function speak(text) {
+  try { const u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; u.rate = 0.95; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch {}
+}
+
+/* ---------- sets ---------- */
+const SCOPE_TITLE = { 'c:due': "Today's review", 'c:all': 'All cards', 'c:again': 'Forgotten cards', 'c:good': 'Known cards', 's:due': "Today's practice", 's:all': 'All sentences', 's:again': 'Forgotten sentences', 's:good': 'Known sentences' };
+
+// due = due now; good / again = not due yet, by last rating — the three never overlap
+const SCOPE_PICK = { due: (e, now) => e.c.due <= now, all: () => true, again: (e, now) => e.c.due > now && lastRating(e.c) === 'again', good: (e, now) => e.c.due > now && lastRating(e.c) === 'good' };
+function startScope(scope) {
+  const [kind, k] = scope.split(':'), now = Date.now();
+  const list = entries(kind === 'c' ? isReview : isSentence).filter((e) => SCOPE_PICK[k](e, now));
+  if (k === 'due') list.sort((a, b) => a.c.due - b.c.due);
+  const ids = list.map((e) => e.id);
+  kind === 'c' ? startReview(SCOPE_TITLE[scope], ids) : startPractice(SCOPE_TITLE[scope], ids);
+}
+
+/* ---------- review: portrait card ---------- */
+let R = null;
+// retry = a second pass over cards just forgotten. It is practice only and leaves the schedule alone:
+// a Got it a minute after forgetting would push the card days out.
+function startReview(title, ids, retry = false) {
+  R = { title, ids, pos: 0, revealed: false, peeked: false, tally: { good: 0, again: 0 }, missed: [], retry, busy: false };
+  showSheet($('#review'));
+  renderReview();
+}
+function closeReview() { R = null; hideSheet($('#review')); renderMain(); }
+function renderReview() {
+  const el = $('#review');
+  if (!R) return;
+  const n = R.ids.length, card = R.pos < n ? S.cards.get(R.ids[R.pos]) : null;
+  const head = `<div class="sheet-head"><button class="app-btn" data-action="close-review" aria-label="Back to home">Back</button><div class="title"><b>${esc(R.title)}</b><small>${n ? Math.min(R.pos + 1, n) + ' / ' + n : ''}</small></div><div class="side"></div></div><div class="progress"><i style="width:${n ? (R.pos / n) * 100 : 0}%"></i></div>`;
+  if (!card) {
+    const body = !n
+      ? `<div class="done"><p>Nothing in this set right now.</p><button class="btn" data-action="close-review">Back</button></div>`
+      : `<div class="done"><b>${R.tally.good + R.tally.again}</b><div class="tally"><span><i class="dot good"></i>Got it ${R.tally.good}</span><span><i class="dot again"></i>Forgot ${R.tally.again}</span></div>${R.missed.length ? `<button class="btn primary" data-action="r-again">Review ${R.missed.length} again</button><button class="btn" data-action="close-review">Done</button>` : '<button class="btn primary" data-action="close-review">Done</button>'}</div>`;
+    el.innerHTML = head + `<div class="r-body">${body}</div>`;
+    return;
+  }
+  el.innerHTML = head + `<div class="r-body">
+      <div class="deck">${R.pos + 1 < n ? '<div class="under"></div>' : ''}
+        <div class="flash" id="flash" role="button" aria-label="Tap to see the answer">
+          <div class="edge" id="edge"></div>
+          <div class="card-top"><span class="chip">${KIND[card.kind] ?? 'Card'}</span></div>
+          <div class="q">${esc(card.zh)}</div>
+          ${R.revealed ? `<div class="answer"><div class="a">${esc(card.en)}</div>${card.note ? `<div class="note">${esc(card.note)}</div>` : ''}<button class="speak" data-action="r-speak">Listen</button></div>` : ''}
+          <div class="tap-hint">${R.peeked ? '← Forgot · Got it →' : 'Tap to see the answer · swipe if you know it'}</div>
+        </div>
+      </div>
+      <div class="r-actions ${R.peeked ? '' : 'off'}"><button class="btn again" data-action="r-rate" data-rating="again">Forgot</button><button class="btn good" data-action="r-rate" data-rating="good">Got it</button></div>
+    </div>
+    <div class="keys"><kbd>Space</kbd> show answer · <kbd>←</kbd> <kbd>→</kbd> swipe · <kbd>1</kbd> forgot · <kbd>2</kbd> got it · <kbd>Esc</kbd> exit</div>`;
+  bindSwipe($('#flash'));
+}
+function toggleReveal() {
+  if (!R || R.busy) return;
+  R.revealed = !R.revealed;
+  if (R.revealed) R.peeked = true;
+  renderReview();
+}
+function reviewDone(rating, dir) {
+  if (!R || R.busy || R.pos >= R.ids.length) return;
+  R.busy = true;
+  if (!R.retry) rate(R.ids[R.pos], rating);
+  if (rating === 'again') R.missed.push(R.ids[R.pos]);
+  R.tally[rating]++;
+  const card = $('#flash');
+  const go = () => { R.pos++; R.revealed = false; R.peeked = false; R.busy = false; renderReview(); };
+  if (!card) return go();
+  card.classList.remove('settle'); card.classList.add('flying');
+  card.style.transform = `translate(${dir * window.innerWidth}px, 40px) rotate(${dir * 24}deg)`;
+  card.style.opacity = '0';
+  setTimeout(go, 260);
+}
+// answer not shown: either direction = got it. Answer shown: left = forgot, right = got it.
+const swipeRating = (dir) => (R.peeked && dir < 0 ? 'again' : 'good');
+function swipeAway(dir) { reviewDone(swipeRating(dir), dir); }
+// Touch screens use touch events: inside the Claude app the host takes over a sideways pointer drag and
+// cancels it, so once the finger clearly moves sideways we preventDefault to keep the gesture. Mouse uses pointer events.
+function bindSwipe(card) {
+  let sx = 0, sy = 0, dx = 0, active = false, mode = null; // mode: null (undecided) | 'x' (swipe) | 'y' (let it scroll)
+  const edge = $('#edge');
+  const start = (x, y) => { active = true; mode = null; sx = x; sy = y; dx = 0; card.classList.remove('settle'); };
+  const move = (x, y) => {
+    dx = x - sx;
+    const dy = y - sy;
+    if (!mode && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) mode = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+    if (mode !== 'x') return false;
+    card.style.transform = `translateX(${dx}px) rotate(${dx / 16}deg)`;
+    edge.style.borderColor = Math.abs(dx) > 90 ? (swipeRating(Math.sign(dx)) === 'again' ? 'var(--red)' : 'var(--green)') : 'transparent';
+    return true;
+  };
+  const reset = () => { card.classList.add('settle'); card.style.transform = ''; edge.style.borderColor = 'transparent'; };
+  const end = () => {
+    if (!active) return; active = false;
+    if (!mode) return toggleReveal();
+    if (mode === 'x' && Math.abs(dx) > 90) swipeAway(Math.sign(dx)); else reset();
+  };
+  card.addEventListener('touchstart', (e) => { if (e.touches.length !== 1 || e.target.closest('button')) { active = false; return; } start(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
+  card.addEventListener('touchmove', (e) => { if (active && move(e.touches[0].clientX, e.touches[0].clientY)) e.preventDefault(); }, { passive: false });
+  card.addEventListener('touchend', (e) => { if (!active) return; e.preventDefault(); end(); }, { passive: false }); // preventDefault: no ghost click after the tap
+  card.addEventListener('touchcancel', () => { if (active) { active = false; reset(); } });
+  card.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse' || e.target.closest('button')) return; start(e.clientX, e.clientY); card.setPointerCapture?.(e.pointerId); });
+  card.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse' && active) move(e.clientX, e.clientY); });
+  card.addEventListener('pointerup', (e) => { if (e.pointerType === 'mouse') end(); });
+  card.addEventListener('pointercancel', (e) => { if (e.pointerType === 'mouse' && active) { active = false; reset(); } });
+}
+
+/* ---------- sentence structure: each letter of the full sentence gets a role from card.parts ---------- */
+function charsFrom(items, card) {
+  if (!items?.length) return null;
+  const out = [];
+  for (const p of items) for (const ch of normChars(p.t)) out.push(p.v);
+  return out.length === normChars(targetOf(card.en)).length ? out : null;
+}
+const charRoles = (card) => charsFrom(card?.parts?.map((p) => ({ t: p.t, v: p.r })), card);
+const charPos = (card) => charsFrom(card?.pos?.map((p) => ({ t: p.t, v: p.p })), card);
+// per-token letter values for a piece (a step or the full sentence), found inside the full sentence
+function pieceRoles(card, pieceTokens, roles = charRoles(card)) {
+  if (!roles) return null;
+  const toks = targetOf(card.en).split(/\s+/).filter(Boolean);
+  const per = []; let k = 0;
+  for (const t of toks) { const L = normChars(t).length; per.push(roles.slice(k, k + L)); k += L; }
+  const want = pieceTokens.map(normChars), have = toks.map(normChars);
+  for (let i = 0; i + want.length <= have.length; i++) {
+    if (want.every((w, j) => w === have[i + j])) return per.slice(i, i + want.length);
+  }
+  return null;
+}
+// a finished word, split into colored spans by role (handles I'm = I + 'm)
+function coloredWord(raw, roles) {
+  if (!roles?.length) return esc(raw);
+  let out = '', cur = null, buf = '', k = 0;
+  const flush = () => { if (buf) out += cur ? `<span class="seg r${cur}">${esc(buf)}</span>` : esc(buf); buf = ''; };
+  for (const ch of raw) {
+    const r = normChars(ch) ? roles[Math.min(k++, roles.length - 1)] : cur;
+    if (r !== cur) { flush(); cur = r; }
+    buf += ch;
+  }
+  flush();
+  return out;
+}
+// Words of a piece. A piece with both subject and verb is a clause → sentence roles;
+// otherwise (a phrase like "two slices of bread") → part of speech per word, if the sheet gave it.
+function wordsFor(card, toks) {
+  let roles = pieceRoles(card, toks), pos = null;
+  if (roles) { const f = roles.flat(); if (!(f.includes('S') && f.includes('V'))) roles = null; }
+  if (!roles) pos = pieceRoles(card, toks, charPos(card));
+  return toks.map((raw, i) => ({ raw, roles: roles?.[i] ?? null, pos: pos?.[i]?.length ? [...new Set(pos[i])].join('·') : '' }));
+}
+// finished words as label groups: one group per run of the same role (or one per word for part of speech),
+// so each label sits centered under its own underline
+function groupsHTML(words) {
+  const groups = [];
+  words.forEach((w, i) => {
+    if (w.roles?.length) {
+      let k = 0, cur = null, first = true;
+      for (const ch of w.raw) {
+        const r = normChars(ch) ? w.roles[Math.min(k++, w.roles.length - 1)] : (cur ?? w.roles[Math.min(k, w.roles.length - 1)]);
+        const g = groups.at(-1);
+        if (g && g.r && g.r === r) g.text += (first && i > 0 ? ' ' : '') + ch;
+        else groups.push({ r, text: ch, sp: first && i > 0 });
+        first = false; cur = r;
+      }
+    } else groups.push({ r: null, pos: w.pos, text: w.raw, sp: i > 0 });
+  });
+  return groups.map((g) => `<span class="grp${g.sp ? ' sp' : ''}${g.r ? ' r' + g.r : ''}${g.pos ? ' pos' : ''}"><span>${esc(g.text)}</span><small>${g.r ? ROLE_ZH[g.r] : g.pos ? esc(g.pos) : '&nbsp;'}</small></span>`).join('');
+}
+function patternOf(parts) {
+  const clauses = [[]];
+  for (const p of parts) {
+    if (p.r === 'J') { if (clauses.at(-1).length) clauses.push([]); continue; }
+    if (p.r === 'A') continue;
+    const c = clauses.at(-1);
+    if (p.r === 'S' && c.includes('V')) { clauses.push([p.r]); continue; }
+    if (p.r === 'V' && c.at(-1) === 'V') continue;
+    c.push(p.r);
+  }
+  const NAME = { 'S V': '主谓', 'S V O': '主谓宾', 'S V C': '主系表', 'S V O O': '主谓双宾', 'S V O K': '主谓宾补' };
+  return clauses.filter((c) => c.length).map((c) => NAME[c.join(' ')] ?? c.map((r) => ROLE_ZH[r]).join('')).join(' + ');
+}
+
+/* ---------- practice: full-screen sentence, short to long ---------- */
+let PR = null;
+// apostrophes don't count, so "im" matches "I'm" (the English keyboard keeps ' on its second page)
+const norm = (s) => String(s).toLowerCase().replace(/[’‘`´']/g, '').replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, '');
+const targetOf = (en) => String(en).split(/\s+\/\s+/)[0].trim();
+const pInput = $('#pInput');
+
+function startPractice(title, ids) {
+  PR = { title, ids, si: 0, steps: [], k: 0, words: [], wi: 0, buffer: '', errors: 0, hints: 0, combo: 0, maxCombo: 0, tally: { perfect: 0, good: 0, again: 0 }, phase: 'typing', bypass: new Set(), errAt: -1, timer: null };
+  showSheet($('#practice'));
+  $('#pTitle').textContent = title;
+  applyColors();
+  loadSentence();
+}
+function applyColors() {
+  $('#practice').classList.toggle('colors', S.colors);
+  $('#pColorsBtn').setAttribute('aria-pressed', String(!!S.colors));
+  $('#pColorsBtn').title = 'Colors ' + (S.colors ? 'on' : 'off');
+}
+function curSentence() { return PR && PR.si < PR.ids.length ? S.cards.get(PR.ids[PR.si]) : null; }
+function loadSentence() {
+  clearTimeout(PR.timer);
+  const n = PR.ids.length;
+  if (PR.si >= n) return showPracticeDone();
+  const id = PR.ids[PR.si], card = S.cards.get(id);
+  if (!card) { PR.si++; return loadSentence(); }
+  if (!card.steps?.length && !PR.bypass.has(id)) return showNoSteps(card);
+  const full = { en: card.en, zh: card.zh };
+  const steps = (card.steps ?? []).filter((s) => norm(targetOf(s.en)) && targetOf(s.en).toLowerCase() !== targetOf(card.en).toLowerCase());
+  PR.steps = [...steps, full];
+  PR.k = 0; PR.errors = 0; PR.hints = 0;
+  loadStep();
+}
+function loadStep() {
+  const st = PR.steps[PR.k], target = targetOf(st.en), card = curSentence();
+  const toks = target.split(/\s+/).filter(Boolean);
+  PR.words = wordsFor(card, toks).map((w) => ({ ...w, norm: norm(w.raw), done: !norm(w.raw), hinted: false }));
+  PR.wi = PR.words.findIndex((w) => !w.done);
+  PR.buffer = ''; PR.errAt = -1; PR.phase = 'typing';
+  pInput.value = '';
+  $('#pAlt').hidden = true; $('#pMain').style.display = 'contents';
+  $('#pResult').hidden = true; $('#pTools').hidden = false;
+  renderPracticeHead();
+  $('#pZh').hidden = false;
+  $('#pZh').innerHTML = st.zh ? esc(st.zh) : '<span class="dict">Dictation · type what you hear</span>';
+  renderSlots();
+  if (!st.zh) speak(target);
+  focusInput();
+  if (PR.wi < 0) stepDone();
+}
+function focusInput() { if (PR && !$('#practice').hidden && $('#splitter').hidden) pInput.focus({ preventScroll: true }); }
+function renderPracticeHead() {
+  const n = PR.ids.length;
+  $('#pProg').textContent = PR.si >= n ? '' : `${PR.si + 1} / ${n}`;
+  $('#pCombo').textContent = PR.combo > 1 ? `Combo ×${PR.combo}` : '';
+  $('#pBar').style.width = (n ? (PR.si / n) * 100 : 0) + '%';
+}
+function renderSlots() {
+  const el = $('#pSlots');
+  // step finished: show the piece as label groups (roles or part of speech)
+  if (PR.phase === 'stepdone') { el.classList.add('grouped'); el.innerHTML = groupsHTML(PR.words); return; }
+  el.classList.remove('grouped');
+  el.innerHTML = PR.words.map((w, i) => {
+    const cur = i === PR.wi && PR.phase === 'typing';
+    const role = w.roles?.find(Boolean) ?? null;
+    const cls = ['slot', role ? 'r' + role : w.pos ? 'pos' : '', w.done ? 'done' : '', cur ? 'cur' : '', w.hinted ? 'hinted' : '', i === PR.errAt ? 'err' : ''].join(' ');
+    const text = w.done ? coloredWord(w.raw, w.roles) : cur ? esc(PR.buffer) + '<i class="caret"></i>' : '';
+    return `<span class="${cls}" style="--n:${Math.max(1, w.raw.length)}">${text}</span>`;
+  }).join('');
+}
+function nextWord() {
+  PR.wi = PR.words.findIndex((w) => !w.done);
+  PR.buffer = ''; pInput.value = '';
+  if (PR.wi < 0) stepDone(); else renderSlots();
+}
+function submitWord(typed) {
+  if (PR.phase !== 'typing' || PR.wi < 0) return;
+  if (!norm(typed)) return;
+  const w = PR.words[PR.wi];
+  if (norm(typed) === w.norm) { w.done = true; PR.errAt = -1; nextWord(); }
+  else {
+    PR.errors++; PR.errAt = PR.wi; PR.buffer = ''; pInput.value = '';
+    renderSlots();
+    setTimeout(() => { if (PR && PR.errAt >= 0) { PR.errAt = -1; renderSlots(); } }, 450);
+  }
+}
+function hint() {
+  if (!PR || PR.phase !== 'typing' || PR.wi < 0) return;
+  const w = PR.words[PR.wi]; w.done = true; w.hinted = true; PR.hints++; PR.errAt = -1;
+  nextWord(); focusInput();
+}
+function stepDone() {
+  PR.phase = 'stepdone';
+  renderSlots();
+  const st = PR.steps[PR.k];
+  speak(targetOf(st.en));
+  const last = PR.k >= PR.steps.length - 1;
+  PR.timer = setTimeout(() => { if (!last) { PR.k++; loadStep(); } else sentenceDone(); }, last ? 900 : 1100);
+}
+function sentenceDone() {
+  const card = curSentence();
+  const result = PR.errors + PR.hints === 0 ? 'perfect' : PR.hints === 0 && PR.errors <= 2 ? 'good' : 'again';
+  rate(PR.ids[PR.si], result === 'again' ? 'again' : 'good');
+  PR.tally[result]++;
+  if (result === 'perfect') { PR.combo++; PR.maxCombo = Math.max(PR.maxCombo, PR.combo); } else PR.combo = 0;
+  PR.phase = 'result';
+  renderPracticeHead();
+  $('#pTools').hidden = true;
+  $('#pSlots').innerHTML = '';
+  const label = { perfect: 'Perfect', good: 'Good', again: 'Again' }[result];
+  const toks = targetOf(card.en).split(/\s+/).filter(Boolean);
+  const pattern = charRoles(card) ? patternOf(card.parts) : '';
+  const line = [pattern && esc(pattern), `<span class="${result}">${label}</span>`, PR.errors ? plural(PR.errors, 'typo', 'typos') : 'No typos', PR.hints ? plural(PR.hints, 'hint', 'hints') : '', result === 'again' ? 'comes back soon' : ''].filter(Boolean).join(' · ');
+  $('#pZh').hidden = true;
+  const r = $('#pResult');
+  r.hidden = false;
+  r.innerHTML = `<div class="full">${groupsHTML(wordsFor(card, toks))}</div><p class="r-zh">${esc(card.zh)}</p><p class="r-line">${line}</p><div class="r-next"><button class="btn primary" data-action="p-next">Next</button><span class="note only-desk">or press Enter</span></div>`;
+  focusInput();
+}
+function nextSentence() { if (!PR) return; PR.si++; loadSentence(); }
+function showNoSteps(card) {
+  PR.phase = 'nosteps';
+  renderPracticeHead();
+  $('#pProg').textContent = `${PR.si + 1} / ${PR.ids.length}`;
+  $('#pMain').style.display = 'none';
+  const alt = $('#pAlt'); alt.hidden = false;
+  alt.innerHTML = `<p class="p-zh">${esc(card.zh)}</p><p class="note">This sentence isn't split yet. Short steps make it easier.</p><div class="row" style="width:min(100%,420px)"><button class="btn" data-action="p-whole">Practice whole sentence</button><button class="btn primary" data-action="p-split">Split it</button></div>`;
+  pInput.blur();
+}
+function showPracticeDone() {
+  PR.phase = 'done';
+  renderPracticeHead();
+  $('#pMain').style.display = 'none';
+  const alt = $('#pAlt'); alt.hidden = false;
+  const n = PR.tally.perfect + PR.tally.good + PR.tally.again;
+  alt.innerHTML = PR.ids.length
+    ? `<div class="done" style="padding:0"><b>${n}</b><p>${plural(n, 'sentence', 'sentences')} this round</p><div class="tally"><span><i class="dot good"></i>Perfect ${PR.tally.perfect}</span><span>Good ${PR.tally.good}</span><span><i class="dot again"></i>Again ${PR.tally.again}</span><span>Best combo ${PR.maxCombo}</span></div><button class="btn primary" data-action="close-practice">Done</button></div>`
+    : `<p>No sentences in this set right now.</p><button class="btn" data-action="close-practice">Back</button>`;
+  pInput.blur();
+}
+function closePractice() { if (PR) clearTimeout(PR.timer); PR = null; try { speechSynthesis.cancel(); } catch {} hideSheet($('#practice')); renderMain(); }
+
+// The input is type="email" so iOS opens the English keyboard instead of pinyin. Email inputs trim spaces
+// from their value, so a typed space is caught here, before it lands, and submits the word.
+pInput.addEventListener('beforeinput', (e) => {
+  if (!PR || !e.data || !/\s/.test(e.data)) return;
+  e.preventDefault();
+  if (PR.phase !== 'typing') return;
+  const typed = (pInput.value + e.data).split(/\s+/).find(Boolean) ?? '';
+  pInput.value = ''; PR.buffer = '';
+  if (typed) submitWord(typed); else renderSlots();
+});
+pInput.addEventListener('input', () => {
+  if (!PR) return;
+  const v = pInput.value;
+  if (PR.phase !== 'typing') { pInput.value = ''; return; }
+  if (/\s/.test(v)) { const typed = v.split(/\s+/)[0]; pInput.value = ''; PR.buffer = ''; if (typed) submitWord(typed); else renderSlots(); return; }
+  PR.buffer = v;
+  if (norm(v) && norm(v) === PR.words[PR.wi].norm) return submitWord(v); // right word: move on without waiting for a space
+  renderSlots();
+});
+pInput.addEventListener('keydown', (e) => {
+  if (!PR) return;
+  if (e.key === 'Tab') { e.preventDefault(); hint(); }
+  else if (e.key === ' ' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); const st = PR.steps[PR.k]; if (st) speak(targetOf(st.en)); }
+  else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (PR.phase === 'typing' && PR.buffer) { const t = PR.buffer; pInput.value = ''; PR.buffer = ''; submitWord(t); }
+    else if (PR.phase === 'result') nextSentence();
+  }
+});
+$('#pStage').addEventListener('click', (e) => { if (!e.target.closest('button')) focusInput(); });
+
+/* ---------- manual split ---------- */
+let SP = null;
+function openSplit(id, fromPractice) {
+  const card = S.cards.get(id);
+  if (!card) return;
+  const tokens = targetOf(card.en).split(/\s+/).filter(Boolean);
+  SP = { id, fromPractice, tokens, start: null, end: null, steps: clone(card.steps ?? []) };
+  $('#spZh').textContent = card.zh;
+  $('#spZhInput').value = '';
+  $('#spMsg').hidden = true;
+  showSheet($('#splitter'));
+  renderSplit();
+}
+const pieceText = (a, b) => SP.tokens.slice(a, b + 1).join(' ').replace(/[,.;:!?，。；：！？]+$/, '');
+function renderSplit() {
+  const lo = SP.start, hi = SP.end ?? SP.start;
+  $('#spWords').innerHTML = SP.tokens.map((t, i) => `<button class="w ${lo !== null && i >= lo && i <= hi ? 'sel' : ''}" data-action="sp-word" data-i="${i}">${esc(t)}</button>`).join('');
+  const pv = $('#spPreview');
+  if (lo === null) { pv.textContent = 'Nothing selected'; pv.classList.add('empty-pv'); } else { pv.textContent = pieceText(lo, hi); pv.classList.remove('empty-pv'); }
+  $('#spAdd').disabled = lo === null;
+  const full = SP.tokens.join(' ');
+  $('#spSteps').innerHTML = SP.steps.map((s, i) => `<li><span class="s-n">${i + 1}</span><div><span class="s-en">${esc(s.en)}</span><span class="note">${s.zh ? esc(s.zh) : '(dictation)'}</span></div><button class="x" data-action="sp-del" data-i="${i}">Remove</button></li>`).join('')
+    + `<li><span class="s-n">${SP.steps.length + 1}</span><div><span class="s-en">${esc(full)}</span><span class="note">Full sentence · added automatically</span></div></li>`;
+}
+function splitAdd() {
+  if (SP.start === null) return;
+  const lo = SP.start, hi = SP.end ?? SP.start, en = pieceText(lo, hi), zh = $('#spZhInput').value.trim();
+  const msg = $('#spMsg');
+  if (normChars(en) === normChars(SP.tokens.join(''))) { msg.textContent = 'The full sentence is added automatically.'; msg.hidden = false; return; }
+  if (SP.steps.some((s) => s.en.toLowerCase() === en.toLowerCase())) { msg.textContent = 'That piece is already a step.'; msg.hidden = false; return; }
+  msg.hidden = true;
+  SP.steps.push(zh ? { en, zh } : { en });
+  SP.steps.sort((a, b) => a.en.split(/\s+/).length - b.en.split(/\s+/).length);
+  SP.start = SP.end = null; $('#spZhInput').value = '';
+  renderSplit();
+}
+async function splitSave(btn) {
+  const card = S.cards.get(SP.id);
+  if (!card || !S.db) return;
+  const body = stripLocal({ ...card, steps: SP.steps });
+  if (!SP.steps.length) delete body.steps;
+  btn.disabled = true; btn.textContent = 'Saving';
+  try {
+    await S.db.doc('cards/' + SP.id).set(clone(body));
+    S.cards.set(SP.id, { ...body, _local: true });
+    const { fromPractice, id } = SP;
+    SP = null; hideSheet($('#splitter'));
+    if (fromPractice && PR) { PR.bypass.delete(id); loadSentence(); } else renderMain();
+  } catch (e) {
+    const msg = $('#spMsg'); msg.textContent = "Couldn't save: " + (e?.message ?? e) + '. Tap Save again.'; msg.hidden = false;
+  } finally { btn.disabled = false; btn.textContent = 'Save'; }
+}
+
+/* ---------- import ---------- */
+let pending = null;
+function normalizeJson(value, today, now) {
+  const list = Array.isArray(value) ? value : Array.isArray(value?.lessons) ? value.lessons : [value];
+  const lessons = [], warnings = [];
+  list.forEach((l, i) => {
+    if (!l || typeof l !== 'object' || !Array.isArray(l.cards)) { warnings.push(`Item ${i + 1} has no cards, skipped`); return; }
+    const cards = l.cards.filter((c) => c && typeof c.zh === 'string' && typeof c.en === 'string' && c.zh.trim() && c.en.trim())
+      .map((c) => ({ ...c, due: Number.isFinite(c.due) ? c.due : now, interval: Number.isFinite(c.interval) ? c.interval : 0 }));
+    if (cards.length < l.cards.length) warnings.push(`Item ${i + 1}: ${l.cards.length - cards.length} cards missing Chinese or English, skipped`);
+    if (!cards.length) return;
+    const date = sheetDate(String(l.date ?? '')) ?? today, topic = String(l.topic ?? '').trim() || 'Imported';
+    lessons.push({ ...l, id: String(l.id || 'imp-' + stableHash(JSON.stringify([date, topic, cards.map((c) => c.zh + '|' + c.en)]))), date, topic, paragraph: typeof l.paragraph === 'string' ? l.paragraph : '', cards });
+  });
+  return { lessons, warnings };
+}
+function parseInput(text) {
+  const t = text.replace(/^﻿/, '').trim();
+  if (!t) return { lessons: [], warnings: ['Nothing to import'] };
+  const opts = { today: todayStr(), now: Date.now() };
+  const sheet = parsePracticeSheet(t, opts);
+  if (sheet) return sheet;
+  if (t.startsWith('[') || t.startsWith('{')) {
+    try { return normalizeJson(JSON.parse(t), opts.today, opts.now); }
+    catch { return { lessons: [], warnings: ['This looks like JSON but it is incomplete (check brackets and quotes)'] }; }
+  }
+  return { lessons: [], warnings: ['Format not recognized. Paste a practice sheet starting with 「#练习单 v1」, an older summary (with headings like 「错误与正确表达」), or an exported JSON backup.'] };
+}
+function doPreview() {
+  const r = parseInput($('#pasteBox').value);
+  const box = $('#preview');
+  box.hidden = false;
+  pending = r.lessons.length ? r.lessons : null;
+  $('#saveBtn').disabled = !pending;
+  const items = r.lessons.map((l) => {
+    const k = (x) => l.cards.filter((c) => c.kind === x).length;
+    const split = l.cards.filter((c) => c.kind === 'sentence' && c.steps?.length).length;
+    const tagged = l.cards.filter((c) => c.kind === 'sentence' && c.parts?.length).length;
+    const exists = S.lessons.has(docIdOf(l.id));
+    const parts = l.cards.some((c) => c.kind) ? `Vocab ${k('vocab')} · Phrases ${k('phrase')} · Collocations ${k('collocation')} · Sentences ${k('sentence')}${k('sentence') ? ` (${split} split, ${tagged} with structure)` : ''}` : plural(l.cards.length, 'card', 'cards');
+    return `<li><b>${esc(l.date)} ${esc(l.topic)}</b><br>${parts}${l.grammar?.length ? ' · Grammar ' + l.grammar.length : ''}${l.paragraph ? ' · has passage' : ''}${exists ? '<br><span class="note">Already imported: only new items are added; progress is kept.</span>' : ''}</li>`;
+  }).join('');
+  box.innerHTML = (items ? `<div>Found ${plural(r.lessons.length, 'session', 'sessions')}:</div><ul>${items}</ul>` : '') + r.warnings.map((w) => `<div class="warn">${esc(w)}</div>`).join('');
+}
+async function pool(tasks, n, onDone) {
+  let i = 0;
+  const run = async () => { while (i < tasks.length) { const t = tasks[i++]; await t(); onDone(); } };
+  await Promise.all(Array.from({ length: Math.min(n, tasks.length) }, run));
+}
+async function saveImport() {
+  if (!pending || !S.db) return;
+  const btn = $('#saveBtn'); btn.disabled = true; $('#previewBtn').disabled = true;
+  let addedLessons = 0, addedCards = 0, merged = 0;
+  try {
+    for (const inc of pending) {
+      const docId = docIdOf(inc.id);
+      const old = fullLesson(docId);
+      const oldEntries = lessonCards(docId);
+      let lesson, writes;
+      if (old) {
+        const m = mergeLesson(old, inc);
+        lesson = m.lesson; addedCards += m.added; merged++;
+        const start = old.cards.length;
+        const nextIndex = oldEntries.reduce((x, e) => Math.max(x, e.c.index), -1) + 1;
+        const same = (a, b) => a.zh === b.zh && a.note === b.note && a.kind === b.kind && JSON.stringify(a.steps ?? null) === JSON.stringify(b.steps ?? null) && JSON.stringify(a.parts ?? null) === JSON.stringify(b.parts ?? null) && JSON.stringify(a.pos ?? null) === JSON.stringify(b.pos ?? null);
+        const changed = lesson.cards.slice(0, start).map((c, i) => [c, oldEntries[i].c.index]).filter(([c], i) => !same(c, old.cards[i]));
+        writes = [...changed, ...lesson.cards.slice(start).map((c, k) => [c, nextIndex + k])];
+      } else { lesson = inc; addedLessons++; addedCards += inc.cards.length; writes = inc.cards.map((c, i) => [c, i]); }
+      let done = 0;
+      await pool(writes.map(([c, i]) => () => S.db.doc(`cards/${docId}~${i}`).set(clone({ ...c, lessonId: docId, index: i }))), 4, () => { btn.textContent = `Saving ${++done}/${writes.length}`; });
+      const { cards, ...meta } = lesson;
+      await S.db.doc('lessons/' + docId).set(clone({ ...meta, cardCount: cards.length, updatedAt: new Date().toISOString() }));
+    }
+    $('#preview').innerHTML = `<div>Saved: ${addedLessons} new, ${merged} merged, ${plural(addedCards, 'new item', 'new items')}.</div>`;
+    $('#pasteBox').value = ''; pending = null;
+    try { localStorage.removeItem('de-draft'); } catch {}
+    btn.textContent = 'Saved';
+  } catch (e) {
+    $('#preview').insertAdjacentHTML('beforeend', `<div class="warn">${e?.code === 'quota_exceeded' ? 'Storage is full: ' : 'Save failed: '}${esc(e?.message ?? e)}. Tap Save again; nothing already saved will be duplicated.</div>`);
+    btn.disabled = false; btn.textContent = 'Save';
+  } finally { $('#previewBtn').disabled = false; }
+}
+
+/* ---------- copy / export ---------- */
+async function copyText(text, btn, fallbackEl) {
+  const label = btn.textContent;
+  try { await navigator.clipboard.writeText(text); btn.textContent = 'Copied'; }
+  catch { if (fallbackEl) { fallbackEl.hidden = false; fallbackEl.value = text; fallbackEl.focus(); fallbackEl.select(); } btn.textContent = 'Selected, copy it manually'; }
+  setTimeout(() => { btn.textContent = label; }, 2000);
+}
+async function doExport(btn) {
+  const json = JSON.stringify(exportAll(), null, 2);
+  const dl = await window.claude?.use?.('downloads');
+  if (!dl) { copyText(json, btn, $('#exportBox')); return; }
+  try { await dl.save({ filename: `self-daily-english-${todayStr()}.json`, data: json }); }
+  catch (e) { if (e?.code !== 'declined') copyText(json, btn, $('#exportBox')); }
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('[data-action],[data-tab]');
+  if (!t) return;
+  if (t.dataset.tab) return setTab(t.dataset.tab);
+  switch (t.dataset.action) {
+    case 'scope': return startScope(t.dataset.scope);
+    case 'lesson-review': { const m = S.lessons.get(t.dataset.id); return startReview(shortTopic(m.topic), lessonCards(t.dataset.id, isReview).map((x) => x.id)); }
+    case 'lesson-practice': { const m = S.lessons.get(t.dataset.id); return startPractice(shortTopic(m.topic), lessonCards(t.dataset.id, isSentence).map((x) => x.id)); }
+    case 'close-review': return closeReview();
+    case 'r-again': return startReview('Missed cards', R.missed.slice(), true);
+    case 'r-rate': return reviewDone(t.dataset.rating, t.dataset.rating === 'good' ? 1 : -1);
+    case 'r-speak': { const c = R && S.cards.get(R.ids[R.pos]); if (c) speak(c.en); return; }
+    case 'close-practice': return closePractice();
+    case 'p-hint': return hint();
+    case 'p-replay': { const st = PR?.steps[PR.k]; if (st) speak(targetOf(st.en)); focusInput(); return; }
+    case 'p-colors': S.colors = !S.colors; try { localStorage.setItem('de-colors', S.colors ? 'on' : 'off'); } catch {} applyColors(); focusInput(); return;
+    case 'p-next': return nextSentence();
+    case 'p-whole': PR.bypass.add(PR.ids[PR.si]); return loadSentence();
+    case 'p-split': return openSplit(PR.ids[PR.si], true);
+    case 'open-split': return openSplit(t.dataset.id, false);
+    case 'close-split': SP = null; hideSheet($('#splitter')); focusInput(); return;
+    case 'sp-word': { const i = +t.dataset.i; if (SP.start === null || SP.end !== null) { SP.start = i; SP.end = null; } else { SP.end = i; if (SP.end < SP.start) [SP.start, SP.end] = [SP.end, SP.start]; } return renderSplit(); }
+    case 'sp-add': return splitAdd();
+    case 'sp-del': SP.steps.splice(+t.dataset.i, 1); return renderSplit();
+    case 'save-split': return splitSave(t);
+    case 'retry-saves': for (const job of [...S.failed.values()]) runSave(job); return;
+    case 'open-import': showSheet($('#importer')); return;
+    case 'close-import': hideSheet($('#importer')); return;
+    case 'preview': return doPreview();
+    case 'save-import': return saveImport();
+    case 'copy-prompt': return copyText(SHEET_PROMPT, t, null);
+    case 'copy-export': return copyText(JSON.stringify(exportAll(), null, 2), t, $('#exportBox'));
+    case 'export': return doExport(t);
+  }
+});
+document.addEventListener('input', (e) => {
+  if (e.target.id === 'search') { S.query = e.target.value; renderHistory(); }
+  if (e.target.id === 'pasteBox') { $('#saveBtn').disabled = true; pending = null; try { localStorage.setItem('de-draft', e.target.value); } catch {} }
+});
+document.addEventListener('toggle', (e) => {
+  const d = e.target;
+  // home and History keep their own open state; History starts collapsed every time it is opened
+  if (d.matches?.('details.lesson')) { const set = d.closest('#historyList') ? S.openH : S.open; if (d.open) set.add(d.dataset.id); else set.delete(d.dataset.id); }
+}, true);
+$('#fileInput').addEventListener('change', async (e) => {
+  const f = e.target.files?.[0];
+  if (f) { $('#pasteBox').value = await f.text(); doPreview(); }
+  e.target.value = '';
+});
+document.addEventListener('keydown', (e) => {
+  const top = topSheet();
+  if (e.key === 'Escape' && top) {
+    e.preventDefault();
+    if (top.id === 'splitter') { SP = null; hideSheet(top); focusInput(); }
+    else if (top.id === 'importer') hideSheet(top);
+    else if (top.id === 'practice') closePractice();
+    else if (top.id === 'review') closeReview();
+    return;
+  }
+  if (top?.id === 'review' && R && !e.target.closest('input,textarea')) {
+    if (e.key === ' ') { e.preventDefault(); toggleReveal(); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); swipeAway(1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); swipeAway(-1); }
+    else if (e.key === '1' && R.peeked) reviewDone('again', -1);
+    else if (e.key === '2' && R.peeked) reviewDone('good', 1);
+  }
+  if (top?.id === 'practice' && PR && document.activeElement !== pInput && !e.ctrlKey && !e.metaKey && e.key.length === 1) focusInput();
+  if (top?.id === 'practice' && PR && PR.phase === 'result' && e.key === 'Enter' && document.activeElement !== pInput) nextSentence();
+});
+
+/* ---------- start ---------- */
+$('#promptText').textContent = SHEET_PROMPT;
+try { const t = localStorage.getItem('de-tab'); if (t === 'history' || t === 'stats') setTab(t); } catch {}
+try { const d = localStorage.getItem('de-draft'); if (d) $('#pasteBox').value = d; } catch {}
+renderMain();
+connect();
+setInterval(() => { if (S.ready && !topSheet()) renderMain(); }, 60000);
+</script>

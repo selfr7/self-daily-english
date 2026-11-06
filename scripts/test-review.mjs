@@ -1,0 +1,23 @@
+import assert from 'node:assert/strict';
+import {reviewCard} from '../app/review-scheduler.ts';
+import {allCards,filterCards,lastRating} from '../app/cards.ts';
+const now=Date.parse('2026-11-04T12:00:00Z'),newCard={zh:'拿铁',en:'Latte',due:now,interval:0};
+const snapshot=JSON.stringify(newCard);
+// forgotten cards come back no sooner than the next day 00:00 Beijing time
+const tomorrowOf=t=>Date.parse(new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai'}).format(new Date(t))+'T00:00:00+08:00')+86400000;
+const forgot=await reviewCard(newCard,'a/0','again','r1',now);
+assert.equal(forgot.due,tomorrowOf(now));assert.equal(Date.parse(forgot.memory.dueAt),forgot.due);assert.equal(forgot.reviewHistory.length,1);assert.equal(lastRating(forgot),'again');assert.equal(JSON.stringify(newCard),snapshot);
+const retry=await reviewCard(forgot,'a/0','again','r1',now+60000);assert.deepEqual(retry,forgot);
+const good=await reviewCard(newCard,'a/0','good','r2',now);assert.ok(good.due>forgot.due);assert.equal(good.memory.reps,1);
+const roundtrip=JSON.parse(JSON.stringify(good));
+const rememberedAgain=await reviewCard(roundtrip,'a/0','good','r3',good.due);assert.ok(rememberedAgain.interval>good.interval);assert.equal(rememberedAgain.memory.reps,2);assert.equal(rememberedAgain.reviewHistory.length,2);
+const lapsed=await reviewCard(rememberedAgain,'a/0','again','r4',rememberedAgain.due);assert.equal(lapsed.due,Math.max(rememberedAgain.due+600000,tomorrowOf(rememberedAgain.due)));assert.equal(lapsed.memory.lapses,1);
+const old={...newCard,interval:12,due:now+86400000};const migrated=await reviewCard(old,'old/0','good','migration',now);assert.equal(migrated.reviewHistory.length,1);assert.equal(old.due,now+86400000);assert.ok(migrated.memory.stability>0);
+const entries=allCards([{id:'a',date:'2026-11-04',topic:'Coffee',paragraph:'x',cards:[newCard,forgot,good]},{id:'b',date:'2026-11-03',topic:'Reading',paragraph:'x',cards:[{...newCard,zh:'精神分析',en:'Psychoanalysis',due:now+100000}]}]);
+const filters={status:'all',date:'',topic:'',query:''};assert.equal(filterCards(entries,filters,now).length,4);
+assert.equal(filterCards(entries,{...filters,status:'due'},now).length,1);
+assert.equal(filterCards(entries,{...filters,status:'again',date:'2026-11-04',topic:'Coffee'},now).length,1);
+assert.equal(filterCards(entries,{...filters,query:'PSYCHO'},now).length,1);
+assert.equal(filterCards(entries,{...filters,status:'good',date:'2026-11-03'},now).length,0);
+const beforeBrowse=JSON.stringify(entries);filterCards(entries,filters,now);assert.equal(JSON.stringify(entries),beforeBrowse);
+console.log('PASS: FSRS two ratings, lapse, JSON restore, idempotent retry, legacy preservation, combined filters, read-only browsing');
