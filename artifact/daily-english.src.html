@@ -678,6 +678,44 @@ function speak(text) {
   try { const u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; u.rate = 0.95; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch {}
 }
 
+/* ---------- sound effects (synthesised, no files) ---------- */
+let AC = null, autoRead = true;
+try { autoRead = localStorage.getItem('de-autoread') !== 'off'; } catch {}
+function audioCtx() {
+  if (!AC) { const C = window.AudioContext || window.webkitAudioContext; if (!C) return null; try { AC = new C(); } catch { return null; } }
+  if (AC.state === 'suspended') AC.resume().catch(() => {});
+  return AC;
+}
+function tone(notes) {
+  const c = audioCtx(); if (!c) return;
+  try {
+    const t = c.currentTime;
+    for (const n of notes) {
+      const o = c.createOscillator(), g = c.createGain(), s = t + n.at;
+      o.type = n.type || 'sine'; o.frequency.setValueAtTime(n.f, s);
+      g.gain.setValueAtTime(0.0001, s); g.gain.exponentialRampToValueAtTime(n.vol || 0.12, s + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, s + n.dur);
+      o.connect(g); g.connect(c.destination); o.start(s); o.stop(s + n.dur + 0.02);
+    }
+  } catch {}
+}
+const playTap = () => tone([{ f: 880, at: 0, dur: 0.06, vol: 0.08, type: 'triangle' }]);
+const playGood = () => tone([{ f: 660, at: 0, dur: 0.14 }, { f: 990, at: 0.09, dur: 0.22 }]);
+const playAgain = () => tone([{ f: 330, at: 0, dur: 0.14, type: 'triangle' }, { f: 247, at: 0.1, dur: 0.24, type: 'triangle' }]);
+function playSwoosh(dir) {
+  const c = audioCtx(); if (!c) return;
+  try {
+    const dur = 0.22, len = Math.floor(c.sampleRate * dur), buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    const src = c.createBufferSource(); src.buffer = buf;
+    const f = c.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 1.2;
+    const t = c.currentTime;
+    f.frequency.setValueAtTime(dir > 0 ? 500 : 2400, t); f.frequency.exponentialRampToValueAtTime(dir > 0 ? 2400 : 500, t + dur);
+    const g = c.createGain();
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.16, t + 0.05); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    src.connect(f); f.connect(g); g.connect(c.destination); src.start(t); src.stop(t + dur);
+  } catch {}
+}
+
 /* ---------- sets ---------- */
 const SCOPE_TITLE = { 'c:due': "Today's review", 'c:all': 'All cards', 'c:again': 'Forgotten cards', 'c:good': 'Known cards', 's:due': "Today's practice", 's:all': 'All sentences', 's:again': 'Forgotten sentences', 's:good': 'Known sentences' };
 
@@ -705,7 +743,7 @@ function renderReview() {
   const el = $('#review');
   if (!R) return;
   const n = R.ids.length, card = R.pos < n ? S.cards.get(R.ids[R.pos]) : null;
-  const head = `<div class="sheet-head"><button class="app-btn" data-action="close-review" aria-label="Back to home">Back</button><div class="title"><b>${esc(R.title)}</b><small>${n ? Math.min(R.pos + 1, n) + ' / ' + n : ''}</small></div><div class="side"></div></div><div class="progress"><i style="width:${n ? (R.pos / n) * 100 : 0}%"></i></div>`;
+  const head = `<div class="sheet-head"><button class="app-btn" data-action="close-review" aria-label="Back to home">Back</button><div class="title"><b>${esc(R.title)}</b><small>${n ? Math.min(R.pos + 1, n) + ' / ' + n : ''}</small></div><div class="side"><button class="app-btn" data-action="r-autoread" aria-pressed="${autoRead}">Auto-read ${autoRead ? 'on' : 'off'}</button></div></div><div class="progress"><i style="width:${n ? (R.pos / n) * 100 : 0}%"></i></div>`;
   if (!card) {
     const body = !n
       ? `<div class="done"><p>Nothing in this set right now.</p><button class="btn" data-action="close-review">Back</button></div>`
@@ -732,11 +770,15 @@ function toggleReveal() {
   if (!R || R.busy) return;
   R.revealed = !R.revealed;
   if (R.revealed) R.peeked = true;
+  playTap();
+  if (R.revealed && autoRead) { const c = S.cards.get(R.ids[R.pos]); if (c) speak(c.en); } else { try { speechSynthesis.cancel(); } catch {} }
   renderReview();
 }
-function reviewDone(rating, dir) {
+function reviewDone(rating, dir, swiped = false) {
   if (!R || R.busy || R.pos >= R.ids.length) return;
   R.busy = true;
+  if (swiped) playSwoosh(dir); else (rating === 'good' ? playGood : playAgain)();
+  try { speechSynthesis.cancel(); } catch {}
   if (!R.retry) rate(R.ids[R.pos], rating);
   if (rating === 'again') R.missed.push(R.ids[R.pos]);
   R.tally[rating]++;
@@ -750,7 +792,7 @@ function reviewDone(rating, dir) {
 }
 // answer not shown: either direction = got it. Answer shown: left = forgot, right = got it.
 const swipeRating = (dir) => (R.peeked && dir < 0 ? 'again' : 'good');
-function swipeAway(dir) { reviewDone(swipeRating(dir), dir); }
+function swipeAway(dir) { reviewDone(swipeRating(dir), dir, true); }
 // Touch screens use touch events: inside the Claude app the host takes over a sideways pointer drag and
 // cancels it, so once the finger clearly moves sideways we preventDefault to keep the gesture. Mouse uses pointer events.
 function bindSwipe(card) {
@@ -1192,6 +1234,7 @@ document.addEventListener('click', (e) => {
     case 'close-review': return closeReview();
     case 'r-again': return startReview('Missed cards', R.missed.slice(), true);
     case 'r-rate': return reviewDone(t.dataset.rating, t.dataset.rating === 'good' ? 1 : -1);
+    case 'r-autoread': autoRead = !autoRead; try { localStorage.setItem('de-autoread', autoRead ? 'on' : 'off'); speechSynthesis.cancel(); } catch {} renderReview(); return;
     case 'r-speak': { const c = R && S.cards.get(R.ids[R.pos]); if (c) speak(c.en); return; }
     case 'close-practice': return closePractice();
     case 'p-hint': return hint();

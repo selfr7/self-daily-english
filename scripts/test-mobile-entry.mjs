@@ -6,7 +6,7 @@ import ts from 'typescript';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 const require=createRequire(import.meta.url),cache=new Map();
-function load(file){if(cache.has(file))return cache.get(file).exports;const module={exports:{}};cache.set(file,module);const code=ts.transpileModule(readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText;new Function('require','module','exports',code)(name=>name.startsWith('.')?load(path.resolve(path.dirname(file),name+(name.endsWith('.ts')?'':name.endsWith('cards')||name.endsWith('speech')||name.endsWith('swipe-gesture')?'.ts':'.tsx'))):require(name),module,module.exports);return module.exports;}
+function load(file){if(cache.has(file))return cache.get(file).exports;const module={exports:{}};cache.set(file,module);const code=ts.transpileModule(readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText;new Function('require','module','exports',code)(name=>name.startsWith('.')?load(path.resolve(path.dirname(file),name+(name.endsWith('.ts')?'':name.endsWith('cards')||name.endsWith('speech')||name.endsWith('swipe-gesture')||name.endsWith('sfx')?'.ts':'.tsx'))):require(name),module,module.exports);return module.exports;}
 const CardLibrary=load(path.resolve('app/CardLibrary.tsx')).default;
 const lessons=[{id:'test',topic:'Coffee',date:'2026-11-04',paragraph:'Test',cards:[{zh:'测试卡片内容',en:'Test card content',due:0,interval:0}]}];
 const setup=renderToStaticMarkup(React.createElement(CardLibrary,{lessons,onReview:async()=>true}));
