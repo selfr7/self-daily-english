@@ -239,7 +239,9 @@ div.done b{font:400 52px var(--f-en);color:var(--num)}
 .colors .slot.pos:not(.done):not(.err):not(.cur){border-bottom-color:var(--edge)}
 .colors .done .seg{color:var(--rc)}
 #practice:not(.colors) .rl,#practice:not(.colors) .grp small{visibility:hidden}
-.p-tools{display:flex;gap:18px}
+.p-tools{display:flex;flex-direction:column;align-items:center;gap:22px}
+.p-tools-row{display:flex;gap:18px}
+.p-tools .skip{font-size:15px;min-height:44px;padding:0 16px}
 .p-result{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;max-width:860px}
 /* finished sentence: each role run is a group, its label sits centered under its own underline */
 .p-result .full,.slots.grouped{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:.55em 0}
@@ -372,15 +374,18 @@ textarea.paste{width:100%;box-sizing:border-box;min-height:200px;max-height:45vh
       <div class="p-zh" id="pZh"></div>
       <div class="slots" id="pSlots" aria-live="polite"></div>
       <div class="p-tools" id="pTools">
-        <button class="linkish" data-action="p-hint">Hint</button>
-        <button class="linkish" data-action="p-replay">Listen</button>
-        <button class="linkish" data-action="p-split">Edit steps</button>
+        <div class="p-tools-row">
+          <button class="linkish" data-action="p-hint">Hint</button>
+          <button class="linkish" data-action="p-replay">Listen</button>
+          <button class="linkish" data-action="p-split">Edit steps</button>
+        </div>
+        <button class="linkish skip" data-action="p-skip">Skip</button>
       </div>
       <div class="p-result" id="pResult" hidden></div>
     </div>
     <div id="pAlt" hidden style="display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center"></div>
   </div>
-  <div class="keys"><kbd>Space</kbd> next word · <kbd>Enter</kbd> confirm / next · <kbd>Tab</kbd> hint · <kbd>Ctrl</kbd>+<kbd>Space</kbd> listen · <kbd>Esc</kbd> exit</div>
+  <div class="keys"><kbd>Space</kbd> next word · <kbd>Enter</kbd> confirm / next · <kbd>Tab</kbd> hint · <kbd>Shift</kbd>+<kbd>Tab</kbd> skip · <kbd>Ctrl</kbd>+<kbd>Space</kbd> listen · <kbd>Esc</kbd> exit</div>
   <input id="pInput" type="email" inputmode="email" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="next" aria-label="Type the English">
 </div>
 
@@ -1018,6 +1023,13 @@ function sentenceDone() {
   focusInput();
 }
 function nextSentence() { if (!PR) return; PR.si++; loadSentence(); }
+// Skip the whole sentence: no rating, no schedule change, combo and tally untouched; it stays due.
+function skipSentence() {
+  if (!PR || PR.phase !== 'typing') return;
+  PR.skipped = (PR.skipped || 0) + 1;
+  try { speechSynthesis.cancel(); } catch {}
+  nextSentence();
+}
 function showNoSteps(card) {
   PR.phase = 'nosteps';
   renderPracticeHead();
@@ -1034,7 +1046,7 @@ function showPracticeDone() {
   const alt = $('#pAlt'); alt.hidden = false;
   const n = PR.tally.perfect + PR.tally.good + PR.tally.again;
   alt.innerHTML = PR.ids.length
-    ? `<div class="done" style="padding:0"><b>${n}</b><p>${plural(n, 'sentence', 'sentences')} this round</p><div class="tally"><span><i class="dot good"></i>Perfect ${PR.tally.perfect}</span><span>Good ${PR.tally.good}</span><span><i class="dot again"></i>Again ${PR.tally.again}</span><span>Best combo ${PR.maxCombo}</span></div><button class="btn primary" data-action="close-practice">Done</button></div>`
+    ? `<div class="done" style="padding:0"><b>${n}</b><p>${plural(n, 'sentence', 'sentences')} this round</p><div class="tally"><span><i class="dot good"></i>Perfect ${PR.tally.perfect}</span><span>Good ${PR.tally.good}</span><span><i class="dot again"></i>Again ${PR.tally.again}</span><span>Best combo ${PR.maxCombo}</span>${PR.skipped ? `<span>Skipped ${PR.skipped}</span>` : ''}</div><button class="btn primary" data-action="close-practice">Done</button></div>`
     : `<p>No sentences in this set right now.</p><button class="btn" data-action="close-practice">Back</button>`;
   pInput.blur();
 }
@@ -1061,7 +1073,7 @@ pInput.addEventListener('input', () => {
 });
 pInput.addEventListener('keydown', (e) => {
   if (!PR) return;
-  if (e.key === 'Tab') { e.preventDefault(); hint(); }
+  if (e.key === 'Tab') { e.preventDefault(); if (e.shiftKey) skipSentence(); else hint(); }
   else if (e.key === ' ' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); const st = PR.steps[PR.k]; if (st) speak(targetOf(st.en)); }
   else if (e.key === 'Enter') {
     e.preventDefault();
@@ -1241,6 +1253,7 @@ document.addEventListener('click', (e) => {
     case 'p-replay': { const st = PR?.steps[PR.k]; if (st) speak(targetOf(st.en)); focusInput(); return; }
     case 'p-colors': S.colors = !S.colors; try { localStorage.setItem('de-colors', S.colors ? 'on' : 'off'); } catch {} applyColors(); focusInput(); return;
     case 'p-next': return nextSentence();
+    case 'p-skip': skipSentence(); return;
     case 'p-whole': PR.bypass.add(PR.ids[PR.si]); return loadSentence();
     case 'p-split': return openSplit(PR.ids[PR.si], true);
     case 'open-split': return openSplit(t.dataset.id, false);
