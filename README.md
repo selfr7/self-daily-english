@@ -58,6 +58,42 @@ We run to a coffee shop for hide. => We ran to a coffee shop to get out of the r
 
 页面通过 `window.claude.use('db')` 读写数据：`lessons/<id>` 存每次练习的记录，`cards/<id>~<序号>` 存每张卡片和复习进度。`downloads` 用来导出 JSON 备份。
 
+### 在 Claude 里怎么用（练完说「总结」就推送）
+
+Artifact 发布好之后，日常只在 Claude 里用，不用复制粘贴。
+
+**每天的流程**
+
+1. 在 claude.ai 或 Claude 桌面版里和 Claude 用英语聊天，练口语。
+2. 聊完说一句「**总结**」。Claude 按上面的练习单格式整理这次的词汇、词组、固定搭配、句子、纠错和段落。
+3. Claude 把练习单直接写进你自己的 Self Daily English artifact 的数据库。
+4. 打开 artifact 链接，**Today** 里的待复习数量已经更新，可以直接复习和练习。
+
+**一次性设置**：把下面这段放进 Claude 的自定义指令（或这个对话所在项目的指令里），再把 artifact 的链接也写进去：
+
+```
+我的英语练习记在 Claude Artifact「Self Daily English」里：<你的 artifact 链接>。
+每次我说「总结」，先按「#练习单 v1」的固定格式整理这次练习（格式见该 artifact 的
+Stats → Import & export → Practice sheet format），然后用 ArtifactData 的 batch 把它写进
+这个 artifact 的数据库，最后告诉我新增了几张卡片。不要只贴代码块让我自己复制。
+```
+
+**写入的数据结构**（`ArtifactData` 以你本人身份写入，artifact 的读写权限本来就只有你自己）：
+
+| 文档 | 内容 |
+| --- | --- |
+| `lessons/<id>` | 一次练习：`id`、`date`（YYYY-MM-DD）、`topic`、`paragraph`、`grammar`、`corrections`、`source`、`cardCount`、`updatedAt` |
+| `cards/<id>~<序号>` | 一张卡片或一个句子：`kind`（`vocab` / `phrase` / `collocation` / `sentence`）、`zh`、`en`、可选 `steps` / `parts` / `pos`，再加 `due`（毫秒时间戳）、`interval`（新卡为 0）、`lessonId`、`index` |
+
+两条规矩，防止弄丢复习进度：
+
+- 同一次练习已经存在时（同一个 `<id>`），**只追加新卡片**（序号接着已有的最大序号往后排），不要对已有的 `cards/...` 重新 `set`，否则复习记录会被清空。
+- `lessons/<id>` 用 `update` 合并字段，不要整份替换。
+
+`<id>` 的规则和解析代码一致：`ps-<日期>-<主题的哈希>`，哈希见 [`shared/practice-sheet.js`](shared/practice-sheet.js) 里的 `stableHash`。拿不准的时候就让 Claude 把练习单贴出来，你在 artifact 里走 **Import** 导入，页面会自动处理 id、去重和合并。
+
+> 这是靠 Claude 的 Artifact 数据工具写入的，需要在能用 Artifact 的 Claude 环境里（claude.ai、桌面版）。如果某个环境没有这个工具，就退回到「复制练习单 → Import」。
+
 ### 修改页面
 
 - `artifact/daily-english.src.html` 是源文件，改这里。
