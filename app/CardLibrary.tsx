@@ -2,20 +2,22 @@
 import {useEffect,useRef,useState,type KeyboardEvent} from 'react';
 import SwipeFlash from './SwipeFlash';
 import SpokenAnswer from './SpokenAnswer';
+import SentencePractice from './SentencePractice';
 import {playTap,playGood,playAgain} from './sfx';
 import {allCards,filterCards,type Lesson,type CardEntry,type CardFilters,type ReviewRating} from './cards';
 type Session={ids:string[],position:number,results:Record<string,ReviewRating>};
-type View='setup'|'browse'|'practice';
-type Props={lessons:Lesson[],initialPractice?:boolean,onReview:(entry:CardEntry,rating:ReviewRating,requestId:string)=>Promise<boolean>};
+type View='setup'|'browse'|'practice'|'typing';
+type Props={lessons:Lesson[],initialPractice?:boolean,initialTyping?:boolean,onReview:(entry:CardEntry,rating:ReviewRating,requestId:string)=>Promise<boolean>};
 const emptyFilters:CardFilters={status:'all',date:'',topic:'',query:''};
-export default function CardLibrary({lessons,initialPractice=false,onReview}:Props){
+export default function CardLibrary({lessons,initialPractice=false,initialTyping=false,onReview}:Props){
+ const sentenceIds=(list:CardEntry[])=>list.filter(c=>c.card.kind==='sentence').sort((a,b)=>a.card.due-b.card.due).map(c=>c.id);
  const [now,setNow]=useState(()=>Date.now()),[filters,setFilters]=useState<CardFilters>({...emptyFilters,status:initialPractice?'due':'all'});
- const [view,setView]=useState<View>(initialPractice?'practice':'setup');
+ const [view,setView]=useState<View>(initialTyping?'typing':initialPractice?'practice':'setup'),[typingIds,setTypingIds]=useState<string[]>(()=>initialTyping?sentenceIds(filterCards(allCards(lessons),{...emptyFilters,status:'due'},Date.now())):[]);
  const [session,setSession]=useState<Session|null>(()=>initialPractice?{ids:filterCards(allCards(lessons),{...emptyFilters,status:'due'},Date.now()).sort((a,b)=>a.card.due-b.card.due).map(c=>c.id),position:0,results:{}}:null);
  const [index,setIndex]=useState(0),[attempt,setAttempt]=useState(0),[flipped,setFlipped]=useState(false),[forgot,setForgot]=useState(false),[saving,setSaving]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
  const lock=useRef(false),pending=useRef<{id:string,rating:ReviewRating}|null>(null),player=useRef<HTMLDivElement>(null),title=useRef<HTMLHeadingElement>(null),opener=useRef<HTMLButtonElement|null>(null);
  const [autoRead,setAutoRead]=useState(true);
- const active=view!=='setup';
+ const active=view==='browse'||view==='practice';
  useEffect(()=>{const timer=setInterval(()=>setNow(Date.now()),30000);return()=>clearInterval(timer)},[]);
  useEffect(()=>{
   if(!active)return;
@@ -37,6 +39,7 @@ export default function CardLibrary({lessons,initialPractice=false,onReview}:Pro
  function changeFilter(next:Partial<CardFilters>){setFilters(f=>({...f,...next}));setIndex(0)}
  function startPractice(){if(lock.current||!matches.length)return;setSession({ids:[...matches].sort((a,b)=>a.card.due-b.card.due).map(c=>c.id),position:0,results:{}});setView('practice');resetFace()}
  function startBrowse(){if(lock.current||!matches.length)return;setIndex(0);setSession(null);setView('browse');resetFace()}
+ function startTyping(){if(lock.current)return;const ids=sentenceIds(matches);if(!ids.length)return;setTypingIds(ids);setView('typing')}
  function exit(){if(lock.current)return;setView('setup');setSession(null);resetFace()}
  function move(step=1){if(lock.current)return;if(view==='practice'){setSession(s=>s?{...s,position:s.position+1}:s)}else if(matches.length){setIndex((browsePosition+step+matches.length)%matches.length)}resetFace()}
  async function rate(rating:ReviewRating,advance:boolean){
@@ -55,11 +58,12 @@ export default function CardLibrary({lessons,initialPractice=false,onReview}:Pro
   if(e.key==='Escape'){e.preventDefault();exit()}
   if(e.key==='Tab'&&player.current){const controls=Array.from(player.current.querySelectorAll<HTMLElement>('button:not(:disabled),textarea:not(:disabled),input:not(:disabled),[tabindex="0"]')).filter(el=>el.getClientRects().length);const first=controls[0],last=controls.at(-1);if(e.shiftKey&&(document.activeElement===first||document.activeElement===title.current)){e.preventDefault();last?.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus()}}
  }
+ if(view==='typing')return <SentencePractice ids={typingIds} entryOf={id=>cards.find(c=>c.id===id)} onReview={onReview} onExit={()=>setView('setup')}/>;
  if(view==='setup')return <div className="cards-setup"><div className="library-heading"><h2>卡片 <small>共 {cards.length} 张</small></h2><p>选好范围，再开始。</p></div>
   <div className="card-filters"><label>状态<select aria-label="筛选复习状态" value={filters.status} onChange={e=>changeFilter({status:e.target.value as CardFilters['status']})}><option value="all">全部卡片</option><option value="due">待复习</option><option value="again">还不会</option><option value="good">记住了</option></select></label><label>学习日期<select aria-label="筛选学习日期" value={filters.date} onChange={e=>changeFilter({date:e.target.value})}><option value="">全部日期</option>{dates.map(date=><option key={date}>{date}</option>)}</select></label><label>主题<select aria-label="筛选主题" value={filters.topic} onChange={e=>changeFilter({topic:e.target.value})}><option value="">全部主题</option>{topics.map(topic=><option key={topic}>{topic}</option>)}</select></label></div>
   <input aria-label="搜索卡片" placeholder="搜索中文、英文或关键词" value={filters.query} onChange={e=>changeFilter({query:e.target.value})}/>
   <div className="selection-summary"><strong>{matches.length} 张卡片</strong><small>{matches.length?'浏览随便翻，练习会记录记忆情况。':cards.length?'换个筛选条件试试。':'保存练习记录后，卡片会出现在这里。'}</small></div>
-  <div className="setup-actions"><button disabled={!matches.length} onClick={e=>{opener.current=e.currentTarget;startBrowse()}}>自由浏览</button><button className="active" disabled={!matches.length} onClick={e=>{opener.current=e.currentTarget;startPractice()}}>开始练习 →</button></div>{cards.length>0&&!matches.length&&<button className="reset-filters" onClick={()=>setFilters(emptyFilters)}>清除筛选，查看全部</button>}
+  <div className="setup-actions"><button disabled={!matches.length} onClick={e=>{opener.current=e.currentTarget;startBrowse()}}>自由浏览</button><button className="active" disabled={!matches.length} onClick={e=>{opener.current=e.currentTarget;startPractice()}}>开始练习 →</button></div><div className="setup-actions typing-entry"><button disabled={!matches.some(c=>c.card.kind==='sentence')} onClick={startTyping}>句子拼写 · {matches.filter(c=>c.card.kind==='sentence').length} 句</button></div>{cards.length>0&&!matches.length&&<button className="reset-filters" onClick={()=>setFilters(emptyFilters)}>清除筛选，查看全部</button>}
  </div>;
  return <div ref={player} className="card-player" role="dialog" aria-modal="true" aria-labelledby="player-title" onKeyDown={dialogKey}>
   <div className="player-shell"><header className="player-header"><button disabled={saving} onClick={exit} aria-label="返回选择范围">← 返回</button><h2 id="player-title" ref={title} tabIndex={-1}>{view==='practice'?'练习':'自由浏览'}</h2><span aria-live="polite">{current?`${view==='practice'?(session?.position??0)+1:browsePosition+1} / ${view==='practice'?session?.ids.length:matches.length}`:'完成'}</span></header>

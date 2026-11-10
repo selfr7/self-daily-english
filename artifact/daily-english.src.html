@@ -443,7 +443,6 @@ const clone = (o) => JSON.parse(JSON.stringify(o));
 const docIdOf = (id) => { let s = String(id).replace(/[^A-Za-z0-9_\-.~:@+]/g, '_').slice(0, 150); if (!s || s === '.' || s === '..') s = 'x' + stableHash(String(id)); return s; };
 const lastRating = (c) => c.reviewHistory?.at(-1)?.rating ?? (c.interval >= 3 ? 'good' : undefined);
 const KIND = { vocab: 'Vocab', phrase: 'Phrase', collocation: 'Collocation', sentence: 'Sentence' };
-const ROLE_ZH = { S: '主', V: '谓', O: '宾', C: '表', K: '补', A: '状', J: '连' };
 const isReview = (c) => c.kind !== 'correction' && c.kind !== 'sentence';
 const isSentence = (c) => c.kind === 'sentence';
 const newReqId = () => 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
@@ -830,84 +829,18 @@ function bindSwipe(card) {
 }
 
 /* ---------- sentence structure: each letter of the full sentence gets a role from card.parts ---------- */
-function charsFrom(items, card) {
-  if (!items?.length) return null;
-  const out = [];
-  for (const p of items) for (const ch of normChars(p.t)) out.push(p.v);
-  return out.length === normChars(targetOf(card.en)).length ? out : null;
-}
-const charRoles = (card) => charsFrom(card?.parts?.map((p) => ({ t: p.t, v: p.r })), card);
-const charPos = (card) => charsFrom(card?.pos?.map((p) => ({ t: p.t, v: p.p })), card);
-// per-token letter values for a piece (a step or the full sentence), found inside the full sentence
-function pieceRoles(card, pieceTokens, roles = charRoles(card)) {
-  if (!roles) return null;
-  const toks = targetOf(card.en).split(/\s+/).filter(Boolean);
-  const per = []; let k = 0;
-  for (const t of toks) { const L = normChars(t).length; per.push(roles.slice(k, k + L)); k += L; }
-  const want = pieceTokens.map(normChars), have = toks.map(normChars);
-  for (let i = 0; i + want.length <= have.length; i++) {
-    if (want.every((w, j) => w === have[i + j])) return per.slice(i, i + want.length);
-  }
-  return null;
-}
 // a finished word, split into colored spans by role (handles I'm = I + 'm)
 function coloredWord(raw, roles) {
-  if (!roles?.length) return esc(raw);
-  let out = '', cur = null, buf = '', k = 0;
-  const flush = () => { if (buf) out += cur ? `<span class="seg r${cur}">${esc(buf)}</span>` : esc(buf); buf = ''; };
-  for (const ch of raw) {
-    const r = normChars(ch) ? roles[Math.min(k++, roles.length - 1)] : cur;
-    if (r !== cur) { flush(); cur = r; }
-    buf += ch;
-  }
-  flush();
-  return out;
-}
-// Words of a piece. A piece with both subject and verb is a clause → sentence roles;
-// otherwise (a phrase like "two slices of bread") → part of speech per word, if the sheet gave it.
-function wordsFor(card, toks) {
-  let roles = pieceRoles(card, toks), pos = null;
-  if (roles) { const f = roles.flat(); if (!(f.includes('S') && f.includes('V'))) roles = null; }
-  if (!roles) pos = pieceRoles(card, toks, charPos(card));
-  return toks.map((raw, i) => ({ raw, roles: roles?.[i] ?? null, pos: pos?.[i]?.length ? [...new Set(pos[i])].join('·') : '' }));
+  return roleSegments(raw, roles).map((g) => (g.r ? `<span class="seg r${g.r}">${esc(g.text)}</span>` : esc(g.text))).join('');
 }
 // finished words as label groups: one group per run of the same role (or one per word for part of speech),
 // so each label sits centered under its own underline
 function groupsHTML(words) {
-  const groups = [];
-  words.forEach((w, i) => {
-    if (w.roles?.length) {
-      let k = 0, cur = null, first = true;
-      for (const ch of w.raw) {
-        const r = normChars(ch) ? w.roles[Math.min(k++, w.roles.length - 1)] : (cur ?? w.roles[Math.min(k, w.roles.length - 1)]);
-        const g = groups.at(-1);
-        if (g && g.r && g.r === r) g.text += (first && i > 0 ? ' ' : '') + ch;
-        else groups.push({ r, text: ch, sp: first && i > 0 });
-        first = false; cur = r;
-      }
-    } else groups.push({ r: null, pos: w.pos, text: w.raw, sp: i > 0 });
-  });
-  return groups.map((g) => `<span class="grp${g.sp ? ' sp' : ''}${g.r ? ' r' + g.r : ''}${g.pos ? ' pos' : ''}"><span>${esc(g.text)}</span><small>${g.r ? ROLE_ZH[g.r] : g.pos ? esc(g.pos) : '&nbsp;'}</small></span>`).join('');
-}
-function patternOf(parts) {
-  const clauses = [[]];
-  for (const p of parts) {
-    if (p.r === 'J') { if (clauses.at(-1).length) clauses.push([]); continue; }
-    if (p.r === 'A') continue;
-    const c = clauses.at(-1);
-    if (p.r === 'S' && c.includes('V')) { clauses.push([p.r]); continue; }
-    if (p.r === 'V' && c.at(-1) === 'V') continue;
-    c.push(p.r);
-  }
-  const NAME = { 'S V': '主谓', 'S V O': '主谓宾', 'S V C': '主系表', 'S V O O': '主谓双宾', 'S V O K': '主谓宾补' };
-  return clauses.filter((c) => c.length).map((c) => NAME[c.join(' ')] ?? c.map((r) => ROLE_ZH[r]).join('')).join(' + ');
+  return groupWords(words).map((g) => `<span class="grp${g.sp ? ' sp' : ''}${g.r ? ' r' + g.r : ''}${g.pos ? ' pos' : ''}"><span>${esc(g.text)}</span><small>${g.r ? ROLE_ZH[g.r] : g.pos ? esc(g.pos) : '&nbsp;'}</small></span>`).join('');
 }
 
 /* ---------- practice: full-screen sentence, short to long ---------- */
 let PR = null;
-// apostrophes don't count, so "im" matches "I'm" (the English keyboard keeps ' on its second page)
-const norm = (s) => String(s).toLowerCase().replace(/[’‘`´']/g, '').replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, '');
-const targetOf = (en) => String(en).split(/\s+\/\s+/)[0].trim();
 const pInput = $('#pInput');
 
 function startPractice(title, ids) {
@@ -930,16 +863,13 @@ function loadSentence() {
   const id = PR.ids[PR.si], card = S.cards.get(id);
   if (!card) { PR.si++; return loadSentence(); }
   if (!card.steps?.length && !PR.bypass.has(id)) return showNoSteps(card);
-  const full = { en: card.en, zh: card.zh };
-  const steps = (card.steps ?? []).filter((s) => norm(targetOf(s.en)) && targetOf(s.en).toLowerCase() !== targetOf(card.en).toLowerCase());
-  PR.steps = [...steps, full];
+  PR.steps = buildSteps(card);
   PR.k = 0; PR.errors = 0; PR.hints = 0;
   loadStep();
 }
 function loadStep() {
   const st = PR.steps[PR.k], target = targetOf(st.en), card = curSentence();
-  const toks = target.split(/\s+/).filter(Boolean);
-  PR.words = wordsFor(card, toks).map((w) => ({ ...w, norm: norm(w.raw), done: !norm(w.raw), hinted: false }));
+  PR.words = makeWords(card, st);
   PR.wi = PR.words.findIndex((w) => !w.done);
   PR.buffer = ''; PR.errAt = -1; PR.phase = 'typing';
   pInput.value = '';
@@ -1004,7 +934,7 @@ function stepDone() {
 }
 function sentenceDone() {
   const card = curSentence();
-  const result = PR.errors + PR.hints === 0 ? 'perfect' : PR.hints === 0 && PR.errors <= 2 ? 'good' : 'again';
+  const result = gradeSentence(PR.errors, PR.hints);
   rate(PR.ids[PR.si], result === 'again' ? 'again' : 'good');
   PR.tally[result]++;
   if (result === 'perfect') { PR.combo++; PR.maxCombo = Math.max(PR.maxCombo, PR.combo); } else PR.combo = 0;
